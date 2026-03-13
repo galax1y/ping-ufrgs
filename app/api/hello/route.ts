@@ -1,5 +1,5 @@
-import database from '@/src/database'
-import { usersInPing } from '@/src/database/drizzle/schema'
+import database from '@/database'
+import { usersInPing } from '@/database/drizzle/schema'
 
 export async function GET() {
   const result = await database.select().from(usersInPing)
