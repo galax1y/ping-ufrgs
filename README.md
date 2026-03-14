@@ -4,15 +4,18 @@ A [Next.js](https://nextjs.org) project.
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Database Schema](#database-schema)
-3. [End-to-End Testing with Playwright](#end-to-end-testing-with-playwright)
-4. [Node.js Version](#nodejs-version)
+1. [Requirements](#requirements)
+2. [Getting Started](#getting-started)
+3. [Database Schema](#database-schema)
+4. [End-to-End Testing with Playwright](#end-to-end-testing-with-playwright)
 5. [Documentation](#documentation)
 
-## Getting Started
+## Requirements
 
-This project requires Node.js version 24. Please ensure you have the correct version installed.
+- Node.js version 24
+- `.env` file with the `DATABASE_URL` variable
+
+## Getting Started
 
 Clone the repository and install dependencies:
 
@@ -47,7 +50,17 @@ npx playwright install
 npx playwright test
 ```
 
+If everything is correctly installed, you can run:
+```bash
+npm run test:e2e
+```
+
+- Safari browser emulation won't work properly on weird Linux distros -> the ones that don't use apt-get (probably) rip arch
+
 ## Documentation
 
+- [Next.js](https://nextjs.org) - Next.js is the main React framework
 - [shadcn/ui](https://ui.shadcn.com) - Component library
 - [Tailwind CSS](https://tailwindcss.com/docs) - Utility-first CSS framework
+- [Playwright](https://playwright.dev/docs/intro) - End-to-end testing framework
+
