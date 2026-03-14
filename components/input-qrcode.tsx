@@ -34,7 +34,7 @@ export function InputQRCode() {
           value={url}
           onChange={handleUrlChange}
           placeholder='Write an url to generate the QR Code'
-          className='w-md'
+          className='max-w-md placeholder:text-sm'
         />
         <Button
           variant='outline'
