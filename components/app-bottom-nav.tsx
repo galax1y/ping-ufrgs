@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, LogOut, Users } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { ClipboardList, LayoutGrid, LogOut, Users } from 'lucide-react'
 
 import { logoutAction } from '@/lib/auth/logout-action'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { FooterThemeToggle } from '@/components/footer-theme-toggle'
 import { cn } from '@/lib/utils'
 
 function NavItem({
@@ -16,7 +17,7 @@ function NavItem({
 }: {
   href: string
   label: string
-  icon: typeof LayoutGrid
+  icon: LucideIcon
   active: boolean
 }) {
   return (
@@ -35,9 +36,20 @@ function NavItem({
   )
 }
 
-export function AppBottomNav({ isAdmin }: { isAdmin: boolean }) {
+export function AppBottomNav({
+  isAdmin,
+  isAssistant,
+}: {
+  isAdmin: boolean
+  isAssistant: boolean
+}) {
   const pathname = usePathname()
   const onStatus = pathname === '/dashboard'
+  const onRequests = pathname.startsWith('/dashboard/key-requests')
+  const onAdmin = pathname.startsWith('/admin')
+
+  const showSecondary = isAdmin || isAssistant
+  const gridCols = showSecondary ? 'grid-cols-4' : 'grid-cols-3'
 
   return (
     <nav
@@ -47,7 +59,7 @@ export function AppBottomNav({ isAdmin }: { isAdmin: boolean }) {
       <div
         className={cn(
           'mx-auto grid h-[4.25rem] max-w-lg gap-1 px-2 pt-1',
-          isAdmin ? 'grid-cols-4' : 'grid-cols-3',
+          gridCols,
         )}
       >
         <NavItem
@@ -61,15 +73,18 @@ export function AppBottomNav({ isAdmin }: { isAdmin: boolean }) {
             href='/admin/members'
             label='Members'
             icon={Users}
-            active={pathname.startsWith('/admin')}
+            active={onAdmin}
           />
         ) : null}
-        <div className='flex h-full flex-col items-center justify-center gap-0.5'>
-          <ThemeToggle />
-          <span className='text-muted-foreground text-[10px] font-medium'>
-            Theme
-          </span>
-        </div>
+        {isAssistant ? (
+          <NavItem
+            href='/dashboard/key-requests'
+            label='Requests'
+            icon={ClipboardList}
+            active={onRequests}
+          />
+        ) : null}
+        <FooterThemeToggle />
         <form action={logoutAction} className='flex h-full min-h-0'>
           <button
             type='submit'

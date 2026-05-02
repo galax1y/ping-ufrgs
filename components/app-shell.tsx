@@ -18,10 +18,13 @@ export async function AppShell({
 
   return (
     <>
-      <main className='bg-background text-foreground min-h-dvh pb-28'>
+      <main className='bg-background text-foreground flex min-h-dvh flex-col pb-28'>
         {children}
       </main>
-      <AppBottomNav isAdmin={member.role === 'admin'} />
+      <AppBottomNav
+        isAdmin={member.role === 'admin'}
+        isAssistant={member.role === 'assistant'}
+      />
     </>
   )
 }

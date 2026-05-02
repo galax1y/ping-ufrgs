@@ -23,6 +23,7 @@ export const keyRequestStatusEnum = ping.enum('key_request_status', [
 ])
 
 export const keyChangeSourceEnum = ping.enum('key_change_source', [
+  'request_created',
   'request_approved',
   'member_trade',
   'assistant_return',

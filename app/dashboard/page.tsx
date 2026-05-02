@@ -2,12 +2,11 @@ import { redirect } from 'next/navigation'
 import { DoorOpen, KeyRound } from 'lucide-react'
 
 import { getDashboardState } from '@/actions/member/get-dashboard-state'
-import {
-  type SemanticStatusTone,
-  semanticStatus,
-} from '@/lib/semantic-status'
+import { type SemanticStatusTone, semanticStatus } from '@/lib/semantic-status'
 import { cn } from '@/lib/utils'
 
+import { AdminResetKeyCard } from './admin-reset-key-card'
+import { AssistantForceRetrieveCard } from './assistant-force-retrieve-card'
 import { RequestKeyButton } from './request-key-button'
 
 export default async function DashboardPage() {
@@ -18,13 +17,27 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const { room, key, keyWithAssistant, canRequestKey, pendingRequestId, self } =
-    state
+  const {
+    room,
+    key,
+    keyWithAssistant,
+    canRequestKey,
+    assistantCanForceRetrieve,
+    pendingRequestId,
+    self,
+    selfHoldsKey,
+  } = state
+
+  const requestHint = pendingRequestId
+    ? 'You already have a pending request.'
+    : selfHoldsKey
+      ? 'You are holding the key.'
+      : !keyWithAssistant
+        ? 'The key is not with the assistant right now.'
+        : 'The key is with the assistant. You can request it below.'
 
   const keyHeadline =
-    key.holderId == null
-      ? 'Assistant'
-      : key.holderName ?? 'Unknown'
+    key.holderId == null ? 'Assistant' : (key.holderName ?? 'Unknown')
 
   const keySub =
     key.holderId != null && key.holderRole
@@ -54,7 +67,7 @@ export default async function DashboardPage() {
       >
         <div
           className={cn(
-            'absolute -right-8 -top-8 size-32 rounded-full blur-2xl',
+            'absolute -top-8 -right-8 size-32 rounded-full blur-2xl',
             roomS.glow,
           )}
         />
@@ -95,7 +108,7 @@ export default async function DashboardPage() {
       >
         <div
           className={cn(
-            'absolute -left-6 top-1/2 size-24 -translate-y-1/2 rounded-full blur-2xl',
+            'absolute top-1/2 -left-6 size-24 -translate-y-1/2 rounded-full blur-2xl',
             keyS.glow,
           )}
         />
@@ -122,22 +135,35 @@ export default async function DashboardPage() {
           {keySub ? (
             <p className={cn('mt-1 text-sm', keyS.subtitleSoft)}>{keySub}</p>
           ) : null}
-          {!keyWithAssistant && self.role === 'member' ? (
+          {!keyWithAssistant && !selfHoldsKey ? (
             <p className='text-muted-foreground mt-3 max-w-[240px] text-xs'>
-              With a member — request unavailable
+              With someone else — request unavailable
             </p>
           ) : null}
         </div>
       </section>
 
-      {self.role === 'member' ? (
-        <div className='pt-2'>
+      {self.role === 'admin' ? <AdminResetKeyCard /> : null}
+
+      {self.role === 'assistant' ? (
+        <AssistantForceRetrieveCard
+          canRetrieve={assistantCanForceRetrieve}
+          currentHolderName={key.holderName}
+        />
+      ) : (
+        <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
+          <div className='space-y-1'>
+            <p className='text-sm font-medium'>Request key from assistant</p>
+            <p className='text-muted-foreground text-xs text-pretty'>
+              {requestHint}
+            </p>
+          </div>
           <RequestKeyButton
             canRequest={canRequestKey}
             pending={pendingRequestId != null}
           />
         </div>
-      ) : null}
+      )}
     </div>
   )
 }

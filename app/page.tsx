@@ -9,8 +9,5 @@ export default async function Home() {
   if (!member) {
     redirect('/login')
   }
-  if (member.role === 'admin') {
-    redirect('/admin/members')
-  }
   redirect('/dashboard')
 }

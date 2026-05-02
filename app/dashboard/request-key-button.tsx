@@ -15,34 +15,30 @@ export function RequestKeyButton({
 }) {
   const router = useRouter()
 
-  if (pending) {
-    return (
-      <Button className='w-full' size='lg' variant='secondary' disabled>
-        Request pending
-      </Button>
-    )
-  }
-
-  if (!canRequest) {
-    return null
-  }
+  const enabled = canRequest && !pending
+  const label = pending ? 'Request pending' : 'Request key'
 
   return (
     <Button
       className='w-full shadow-lg'
       size='lg'
       type='button'
-      onClick={async () => {
-        const r = await requestKeyAction('')
-        if (r.ok) {
-          toast.success('Request sent.')
-          router.refresh()
-        } else {
-          toast.error(r.error)
-        }
-      }}
+      disabled={!enabled}
+      onClick={
+        enabled
+          ? async () => {
+              const r = await requestKeyAction('')
+              if (r.ok) {
+                toast.success('Request sent.')
+                router.refresh()
+              } else {
+                toast.error(r.error)
+              }
+            }
+          : undefined
+      }
     >
-      Request key
+      {label}
     </Button>
   )
 }

@@ -10,6 +10,7 @@ import {
   roomStateInPing,
 } from '@/database/drizzle/schema'
 import { requireAuth } from '@/lib/auth/guards'
+import { isSameMember } from '@/lib/member-ids'
 
 export type DashboardState = {
   self: {
@@ -18,6 +19,8 @@ export type DashboardState = {
     email: string
     role: 'admin' | 'member' | 'assistant'
   }
+  /** You are the current key holder (DB holder_id). */
+  selfHoldsKey: boolean
   room: {
     name: string
     isOpen: boolean
@@ -30,9 +33,17 @@ export type DashboardState = {
     holderRole: 'admin' | 'member' | 'assistant' | null
     heldSince: Date | null
   }
-  /** Key is with the assistant (vault) or the assistant member is the holder. */
+  /**
+   * Key is in assistant custody: vault (no holder) or an assistant member holds it.
+   * Requests are only allowed in this state (and when you are not the holder).
+   */
   keyWithAssistant: boolean
+  /** You may submit a new request (assistant custody, you do not hold, no pending). Assistants never use this. */
   canRequestKey: boolean
+  /**
+   * Assistant only: another member (or admin) holds the key — you may forcibly retrieve it (confirmed in UI).
+   */
+  assistantCanForceRetrieve: boolean
   pendingRequestId: string | null
 }
 
@@ -82,25 +93,30 @@ export async function getDashboardState(): Promise<DashboardState> {
   const keyWithAssistant =
     keyRow?.holderId == null || holderRole === 'assistant'
 
-  let pendingRequestId: string | null = null
-  if (member.role === 'member') {
-    const [pr] = await database
-      .select({ id: keyRequestsInPing.id })
-      .from(keyRequestsInPing)
-      .where(
-        and(
-          eq(keyRequestsInPing.requesterId, member.id),
-          eq(keyRequestsInPing.status, 'pending'),
-        ),
-      )
-      .limit(1)
-    pendingRequestId = pr?.id ?? null
-  }
+  const selfHoldsKey = isSameMember(keyRow?.holderId, member.id)
+
+  const [pendingRow] = await database
+    .select({ id: keyRequestsInPing.id })
+    .from(keyRequestsInPing)
+    .where(
+      and(
+        eq(keyRequestsInPing.requesterId, member.id),
+        eq(keyRequestsInPing.status, 'pending'),
+      ),
+    )
+    .limit(1)
+  const pendingRequestId = pendingRow?.id ?? null
 
   const canRequestKey =
-    member.role === 'member' &&
+    member.role !== 'assistant' &&
+    !selfHoldsKey &&
     keyWithAssistant &&
     pendingRequestId === null
+
+  const assistantCanForceRetrieve =
+    member.role === 'assistant' &&
+    keyRow?.holderId != null &&
+    !isSameMember(keyRow.holderId, member.id)
 
   return {
     self: {
@@ -109,6 +125,7 @@ export async function getDashboardState(): Promise<DashboardState> {
       email: member.email,
       role: member.role,
     },
+    selfHoldsKey,
     room: roomRow
       ? {
           name: roomRow.name,
@@ -125,6 +142,7 @@ export async function getDashboardState(): Promise<DashboardState> {
     },
     keyWithAssistant,
     canRequestKey,
+    assistantCanForceRetrieve,
     pendingRequestId,
   }
 }

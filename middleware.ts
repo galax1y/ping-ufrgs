@@ -31,15 +31,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  if (pathname === '/dashboard') {
+  if (pathname.startsWith('/dashboard')) {
     if (!p) return NextResponse.redirect(new URL('/login', request.url))
     return NextResponse.next()
   }
 
   if (pathname === '/login') {
     if (p) {
-      const dest = p.role === 'admin' ? '/admin/members' : '/dashboard'
-      return NextResponse.redirect(new URL(dest, request.url))
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     return NextResponse.next()
   }
@@ -48,5 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/dashboard', '/login'],
+  matcher: ['/admin/:path*', '/dashboard', '/dashboard/:path*', '/login'],
 }

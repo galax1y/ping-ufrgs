@@ -8,6 +8,13 @@
       "when": 1777748326588,
       "tag": "0000_key_control_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777748326590,
+      "tag": "0001_key_change_request_created",
+      "breakpoints": true
     }
   ]
 }

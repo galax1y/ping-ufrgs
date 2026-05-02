@@ -40,8 +40,5 @@ export async function loginAction(
 
   await createSession({ id: row.id, role: row.role })
 
-  if (row.role === 'admin') {
-    redirect('/admin/members')
-  }
   redirect('/dashboard')
 }

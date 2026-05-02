@@ -15,3 +15,11 @@ export async function requireAdmin() {
   }
   return member
 }
+
+export async function requireAssistant() {
+  const member = await requireAuth()
+  if (member.role !== 'assistant') {
+    throw new Error('Forbidden')
+  }
+  return member
+}
