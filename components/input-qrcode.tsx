@@ -1,19 +1,34 @@
 'use client'
 
 import { ChangeEvent, useState } from 'react'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
 import QRCode from 'react-qr-code'
-import z from 'zod'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 
 export function InputQRCode() {
   const [url, setUrl] = useState<string>('')
   const [displayedUrl, setDisplayedUrl] = useState<string>('')
 
-  const handleUrlChange = (
-    e: ChangeEvent<HTMLInputElement, HTMLInputElement>,
-  ) => {
+  const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value)
   }
 
@@ -21,41 +36,67 @@ export function InputQRCode() {
     const result = z.url().safeParse(url)
 
     if (result.error) {
-      return toast.error('Please insert a valid URL')
+      toast.error('Please insert a valid URL')
+      return
     }
 
     setDisplayedUrl(result.data)
   }
 
   return (
-    <div className='flex flex-col items-center space-y-4 self-center'>
-      <div className='flex gap-2'>
-        <Input
-          value={url}
-          onChange={handleUrlChange}
-          placeholder='Write an url to generate the QR Code'
-          className='max-w-md placeholder:text-sm'
-        />
-        <Button
-          variant='outline'
-          onClick={handleDisplayUrl}
-          className='hover:bg-primary'
-        >
-          Generate
-        </Button>
-      </div>
+    <Card className='border-border/50 w-full max-w-lg shadow-lg'>
+      <CardHeader>
+        <CardTitle>QR code</CardTitle>
+        <CardDescription>
+          Enter a URL to generate a scannable QR code.
+        </CardDescription>
+      </CardHeader>
+      <Separator />
+      <CardContent className='space-y-6 pt-6'>
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor='qr-url'>URL</FieldLabel>
+            <FieldContent>
+              <div className='flex flex-col gap-2 sm:flex-row sm:items-stretch'>
+                <Input
+                  id='qr-url'
+                  value={url}
+                  onChange={handleUrlChange}
+                  placeholder='https://example.com'
+                  className='placeholder:text-sm'
+                />
+                <Button
+                  type='button'
+                  variant='secondary'
+                  onClick={handleDisplayUrl}
+                  className='shrink-0 sm:w-auto'
+                >
+                  Generate
+                </Button>
+              </div>
+              <FieldDescription>
+                The QR encodes exactly the URL you confirm with Generate.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldGroup>
 
-      {displayedUrl && displayedUrl.length > 0 && (
-        <div className='border-accent w-xl rounded-xl border-2 bg-white p-4 shadow-sm'>
-          <QRCode className='h-full w-full' value={displayedUrl} />
-        </div>
-      )}
-
-      <div className='h-8'>
-        {!!displayedUrl && displayedUrl !== url && (
-          <p>QR Code is not the same as the one in the Input component</p>
-        )}
-      </div>
-    </div>
+        {displayedUrl ? (
+          <div className='flex justify-center'>
+            <div className='border-border bg-background rounded-xl border p-4 shadow-sm'>
+              <QRCode className='h-full w-full' value={displayedUrl} />
+            </div>
+          </div>
+        ) : null}
+      </CardContent>
+      {!!displayedUrl && displayedUrl !== url ? (
+        <CardFooter className='border-t'>
+          <p className='text-muted-foreground text-sm'>
+            QR code does not match the current input — click Generate again to
+            update.
+          </p>
+        </CardFooter>
+      ) : null}
+    </Card>
   )
 }

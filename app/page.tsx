@@ -1,20 +1,16 @@
-import { InputQRCode } from '@/components/input-qrcode'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
-export default function Home() {
-  return (
-    <div className='flex min-h-screen flex-col items-center justify-center'>
-      <div className='container px-6'>
-        <section className='flex flex-col items-center justify-start'>
-          <h1 className='text-primary mb-6 text-3xl'>QR Code experiment</h1>
-          <InputQRCode />
-        </section>
+import { getSession } from '@/lib/auth/session'
 
-        <Button className='w-full' asChild>
-          <Link href={'/check-in'}>Check in</Link>
-        </Button>
-      </div>
-    </div>
-  )
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const { member } = await getSession()
+  if (!member) {
+    redirect('/login')
+  }
+  if (member.role === 'admin') {
+    redirect('/admin/members')
+  }
+  redirect('/dashboard')
 }

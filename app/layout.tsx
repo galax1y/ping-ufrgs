@@ -1,6 +1,10 @@
 import { Toaster } from 'sonner'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+
+import { AppShell } from '@/components/app-shell'
+import { ThemeProvider } from '@/components/theme-provider'
+
 import './globals.css'
 
 const geistSans = Geist({
@@ -15,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Ping UFRGS',
-  description: '',
+  description: 'Room key and access',
 }
 
 export default function RootLayout({
@@ -24,12 +28,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='en'>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
-      >
-        <main className='bg-background text-foreground'>{children}</main>
-        <Toaster richColors />
+    <html
+      lang='en'
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable}`}
+    >
+      <body className='min-h-screen font-sans antialiased'>
+        <ThemeProvider>
+          <AppShell>{children}</AppShell>
+          <Toaster richColors position='top-center' closeButton />
+        </ThemeProvider>
       </body>
     </html>
   )

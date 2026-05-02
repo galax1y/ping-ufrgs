@@ -4,6 +4,6 @@ import * as schema from './drizzle/schema'
 
 const client = postgres(process.env.DATABASE_URL!, { prepare: false })
 
-const database = drizzle(client, { schema, logger: true })
+const database = drizzle(client, { schema })
 
 export default database
