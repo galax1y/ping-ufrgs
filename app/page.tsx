@@ -1,13 +1,8 @@
-import { getUsers } from '@/actions/get-users'
 import { InputQRCode } from '@/components/input-qrcode'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-export default async function Home() {
-  const users = await getUsers()
-
-  console.log(users)
-
+export default function Home() {
   return (
     <div className='flex min-h-screen flex-col items-center justify-center'>
       <div className='container px-6'>

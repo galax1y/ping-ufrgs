@@ -1,29 +1,302 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "2c84dc1f-ddb8-430f-a9dd-7ed4deeb1583",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "ping.users": {
-      "name": "users",
+    "ping.key_ownership_log": {
+      "name": "key_ownership_log",
       "schema": "ping",
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "previous_holder_id": {
+          "name": "previous_holder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "new_holder_id": {
+          "name": "new_holder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source": {
+          "name": "source",
+          "type": "key_change_source",
+          "typeSchema": "ping",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_id": {
+          "name": "actor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "key_ownership_log_previous_holder_id_members_id_fk": {
+          "name": "key_ownership_log_previous_holder_id_members_id_fk",
+          "tableFrom": "key_ownership_log",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "previous_holder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "key_ownership_log_new_holder_id_members_id_fk": {
+          "name": "key_ownership_log_new_holder_id_members_id_fk",
+          "tableFrom": "key_ownership_log",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "new_holder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "key_ownership_log_actor_id_members_id_fk": {
+          "name": "key_ownership_log_actor_id_members_id_fk",
+          "tableFrom": "key_ownership_log",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "actor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "key_ownership_log_request_id_key_requests_id_fk": {
+          "name": "key_ownership_log_request_id_key_requests_id_fk",
+          "tableFrom": "key_ownership_log",
+          "tableTo": "key_requests",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "request_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "ping.key_requests": {
+      "name": "key_requests",
+      "schema": "ping",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "byDefault",
-            "name": "ping.user_details_id_seq",
-            "increment": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "startWith": "1",
-            "cache": "1",
-            "cycle": false,
-            "schema": "ping"
-          }
+          "default": "gen_random_uuid()"
+        },
+        "requester_id": {
+          "name": "requester_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "key_request_status",
+          "typeSchema": "ping",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decided_by": {
+          "name": "decided_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decided_at": {
+          "name": "decided_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decision_note": {
+          "name": "decision_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "key_requests_one_pending_per_requester_idx": {
+          "name": "key_requests_one_pending_per_requester_idx",
+          "columns": [
+            {
+              "expression": "requester_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"ping\".\"key_requests\".\"status\" = 'pending'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "key_requests_requester_id_members_id_fk": {
+          "name": "key_requests_requester_id_members_id_fk",
+          "tableFrom": "key_requests",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "requester_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "key_requests_decided_by_members_id_fk": {
+          "name": "key_requests_decided_by_members_id_fk",
+          "tableFrom": "key_requests",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "decided_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "ping.key_state": {
+      "name": "key_state",
+      "schema": "ping",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "smallint",
+          "primaryKey": true,
+          "notNull": true,
+          "default": 1
+        },
+        "holder_id": {
+          "name": "holder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "held_since": {
+          "name": "held_since",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "key_state_holder_id_members_id_fk": {
+          "name": "key_state_holder_id_members_id_fk",
+          "tableFrom": "key_state",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "holder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "key_state_singleton_check": {
+          "name": "key_state_singleton_check",
+          "value": "\"ping\".\"key_state\".\"id\" = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "ping.members": {
+      "name": "members",
+      "schema": "ping",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -39,9 +312,23 @@
         },
         "enrollment_number": {
           "name": "enrollment_number",
-          "type": "bigint",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "member_role",
+          "typeSchema": "ping",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'member'"
         },
         "created_at": {
           "name": "created_at",
@@ -49,47 +336,170 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "members_email_unique": {
+          "name": "members_email_unique",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "members_enrollment_number_unique": {
+          "name": "members_enrollment_number_unique",
+          "columns": [
+            {
+              "expression": "enrollment_number",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "members_one_assistant_idx": {
+          "name": "members_one_assistant_idx",
+          "columns": [
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"ping\".\"members\".\"role\" = 'assistant'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "user_details_enrollment_number_key": {
-          "columns": [
-            "enrollment_number"
-          ],
-          "nullsNotDistinct": false,
-          "name": "user_details_enrollment_number_key"
-        }
-      },
-      "checkConstraints": {},
+      "uniqueConstraints": {},
       "policies": {},
-      "isRLSEnabled": true
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
-    "ping.user_devices": {
-      "name": "user_devices",
+    "ping.room_state": {
+      "name": "room_state",
       "schema": "ping",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "smallint",
           "primaryKey": true,
           "notNull": true,
-          "default": "gen_random_uuid()"
+          "default": 1
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "bigint",
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Room'"
+        },
+        "is_open": {
+          "name": "is_open",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "status_changed_at": {
+          "name": "status_changed_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         },
-        "is_active": {
-          "name": "is_active",
+        "last_changed_by": {
+          "name": "last_changed_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "room_state_last_changed_by_members_id_fk": {
+          "name": "room_state_last_changed_by_members_id_fk",
+          "tableFrom": "room_state",
+          "tableTo": "members",
+          "schemaTo": "ping",
+          "columnsFrom": [
+            "last_changed_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "room_state_singleton_check": {
+          "name": "room_state_singleton_check",
+          "value": "\"ping\".\"room_state\".\"id\" = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "ping.room_status_log": {
+      "name": "room_status_log",
+      "schema": "ping",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "is_open": {
+          "name": "is_open",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": false
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "room_change_source",
+          "typeSchema": "ping",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_id": {
+          "name": "actor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -97,39 +507,72 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "unique_device_id": {
-          "name": "unique_device_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "user_devices_user_id_fkey": {
-          "name": "user_devices_user_id_fkey",
-          "tableFrom": "user_devices",
-          "tableTo": "users",
+        "room_status_log_actor_id_members_id_fk": {
+          "name": "room_status_log_actor_id_members_id_fk",
+          "tableFrom": "room_status_log",
+          "tableTo": "members",
           "schemaTo": "ping",
           "columnsFrom": [
-            "user_id"
+            "actor_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "cascade"
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
-      "isRLSEnabled": true
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "ping.key_change_source": {
+      "name": "key_change_source",
+      "schema": "ping",
+      "values": [
+        "request_approved",
+        "member_trade",
+        "assistant_return",
+        "admin_action",
+        "initial"
+      ]
+    },
+    "ping.key_request_status": {
+      "name": "key_request_status",
+      "schema": "ping",
+      "values": [
+        "pending",
+        "approved",
+        "denied",
+        "cancelled"
+      ]
+    },
+    "ping.member_role": {
+      "name": "member_role",
+      "schema": "ping",
+      "values": [
+        "admin",
+        "member",
+        "assistant"
+      ]
+    },
+    "ping.room_change_source": {
+      "name": "room_change_source",
+      "schema": "ping",
+      "values": [
+        "holder_action",
+        "admin_override"
+      ]
+    }
+  },
   "schemas": {
     "ping": "ping"
   },
@@ -138,11 +581,8 @@
   "policies": {},
   "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
     "tables": {}
   }
 }

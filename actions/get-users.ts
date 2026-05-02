@@ -2,14 +2,14 @@
 'use server'
 
 import database from '@/database'
-import { usersInPing } from '@/database/drizzle/schema'
+import { membersInPing } from '@/database/drizzle/schema'
 
 // Example drizzle use
 // If select returns nothing and you're sure the database has rows, probably the Supabase config has enabled RLS
 // RLS is just a security measure that requires a policy to be followed for it to return data.
 
 export const getUsers = async () => {
-  const result = await database.select().from(usersInPing)
+  const result = await database.select().from(membersInPing)
 
   return result
 }
