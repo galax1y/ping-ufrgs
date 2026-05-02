@@ -8,18 +8,29 @@ import {
   keyOwnershipLogInPing,
   keyRequestsInPing,
   keyStateInPing,
-  membersInPing,
 } from '@/database/drizzle/schema'
-import { requireAssistant } from '@/lib/auth/guards'
+import { requireAuth } from '@/lib/auth/guards'
+import { isSameMember } from '@/lib/member-ids'
 
-export type AcceptKeyRequestResult =
+export type AcceptKeyRequestFromHolderResult =
   | { ok: true }
   | { ok: false; error: string }
 
-export async function acceptKeyRequestAction(
+/**
+ * Current key holder (member or admin) approves another member’s request
+ * to receive the key directly.
+ */
+export async function acceptKeyRequestFromHolderAction(
   requestId: string,
-): Promise<AcceptKeyRequestResult> {
-  const assistant = await requireAssistant()
+): Promise<AcceptKeyRequestFromHolderResult> {
+  const holder = await requireAuth()
+
+  if (holder.role === 'assistant') {
+    return {
+      ok: false,
+      error: 'Use the assistant request queue for vault handovers.',
+    }
+  }
 
   if (!requestId) {
     return { ok: false, error: 'Invalid request.' }
@@ -39,8 +50,11 @@ export async function acceptKeyRequestAction(
       if (req.status !== 'pending') {
         throw new Error('NOT_PENDING')
       }
-      if (req.kind !== 'assistant') {
+      if (req.kind !== 'holder' || req.targetHolderId == null) {
         throw new Error('WRONG_KIND')
+      }
+      if (!isSameMember(req.targetHolderId, holder.id)) {
+        throw new Error('NOT_YOUR_REQUEST')
       }
 
       const [keyRow] = await tx
@@ -49,25 +63,12 @@ export async function acceptKeyRequestAction(
         .where(eq(keyStateInPing.id, 1))
         .limit(1)
 
-      let holderRole: 'admin' | 'member' | 'assistant' | null = null
-      if (keyRow?.holderId) {
-        const [h] = await tx
-          .select({ role: membersInPing.role })
-          .from(membersInPing)
-          .where(eq(membersInPing.id, keyRow.holderId))
-          .limit(1)
-        holderRole = h?.role ?? null
+      if (!isSameMember(keyRow?.holderId, holder.id)) {
+        throw new Error('NO_LONGER_HOLDER')
       }
 
-      const keyWithAssistant =
-        keyRow?.holderId == null || holderRole === 'assistant'
-
-      if (!keyWithAssistant) {
-        throw new Error('KEY_NOT_WITH_ASSISTANT')
-      }
-
-      const previousHolderId = keyRow?.holderId ?? null
       const decidedAt = new Date()
+      const previousHolderId = keyRow?.holderId ?? null
 
       await tx
         .update(keyStateInPing)
@@ -81,7 +82,7 @@ export async function acceptKeyRequestAction(
         .update(keyRequestsInPing)
         .set({
           status: 'approved',
-          decidedById: assistant.id,
+          decidedById: holder.id,
           decidedAt,
           decisionNote: null,
         })
@@ -91,7 +92,7 @@ export async function acceptKeyRequestAction(
         previousHolderId,
         newHolderId: req.requesterId,
         source: 'request_approved',
-        actorId: assistant.id,
+        actorId: holder.id,
         requestId: req.id,
         note: null,
       })
@@ -100,7 +101,7 @@ export async function acceptKeyRequestAction(
         .update(keyRequestsInPing)
         .set({
           status: 'cancelled',
-          decidedById: assistant.id,
+          decidedById: holder.id,
           decidedAt,
           decisionNote: 'Cancelled: key issued to another member',
         })
@@ -119,18 +120,19 @@ export async function acceptKeyRequestAction(
     if (msg === 'NOT_PENDING') {
       return { ok: false, error: 'This request is no longer pending.' }
     }
-    if (msg === 'KEY_NOT_WITH_ASSISTANT') {
+    if (msg === 'WRONG_KIND') {
+      return { ok: false, error: 'This is not a holder-to-holder request.' }
+    }
+    if (msg === 'NOT_YOUR_REQUEST') {
       return {
         ok: false,
-        error:
-          'The key is not with the assistant anymore. Resolve custody first.',
+        error: 'Only the person this was sent to can accept it.',
       }
     }
-    if (msg === 'WRONG_KIND') {
+    if (msg === 'NO_LONGER_HOLDER') {
       return {
         ok: false,
-        error:
-          'This request must be accepted by the current key holder, not the assistant.',
+        error: 'You no longer hold the key — this request is stale.',
       }
     }
     console.error(e)

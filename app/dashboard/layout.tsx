@@ -15,8 +15,8 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className='from-background via-background to-muted/30 flex flex-1 flex-col bg-gradient-to-b'>
-      <div className='mx-auto w-full max-w-lg flex-1 px-4 pt-6 pb-4'>
+    <div className='from-background via-background to-muted/30 flex min-h-0 flex-1 flex-col bg-gradient-to-b'>
+      <div className='mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col px-4 pt-6 pb-4'>
         {children}
       </div>
     </div>

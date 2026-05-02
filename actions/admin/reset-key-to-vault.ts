@@ -57,6 +57,7 @@ export async function resetKeyToVaultAction(): Promise<ResetKeyResult> {
 
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/key-requests')
+  revalidatePath('/dashboard/history')
   revalidatePath('/admin/members')
   return { ok: true }
 }

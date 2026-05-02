@@ -1,6 +1,6 @@
 'use server'
 
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 
 import database from '@/database'
 import {
@@ -11,6 +11,14 @@ import {
 } from '@/database/drizzle/schema'
 import { requireAuth } from '@/lib/auth/guards'
 import { isSameMember } from '@/lib/member-ids'
+
+export type IncomingHolderKeyRequestRow = {
+  id: string
+  createdAt: string
+  requesterName: string
+  requesterEmail: string
+  reason: string | null
+}
 
 export type DashboardState = {
   self: {
@@ -40,6 +48,13 @@ export type DashboardState = {
   keyWithAssistant: boolean
   /** You may submit a new request (assistant custody, you do not hold, no pending). Assistants never use this. */
   canRequestKey: boolean
+  /**
+   * You may ask the current member/admin holder for the key (not assistant custody).
+   * Assistants never use this.
+   */
+  canRequestKeyFromHolder: boolean
+  /** Pending requests from others asking you (the current holder) for the key. */
+  incomingHolderRequests: IncomingHolderKeyRequestRow[]
   /**
    * Assistant only: another member (or admin) holds the key — you may forcibly retrieve it (confirmed in UI).
    */
@@ -113,6 +128,47 @@ export async function getDashboardState(): Promise<DashboardState> {
     keyWithAssistant &&
     pendingRequestId === null
 
+  const canRequestKeyFromHolder =
+    member.role !== 'assistant' &&
+    !selfHoldsKey &&
+    !keyWithAssistant &&
+    keyRow?.holderId != null &&
+    !isSameMember(keyRow.holderId, member.id) &&
+    pendingRequestId === null
+
+  let incomingHolderRequests: IncomingHolderKeyRequestRow[] = []
+  if (member.role !== 'assistant') {
+    const incomingRows = await database
+      .select({
+        id: keyRequestsInPing.id,
+        createdAt: keyRequestsInPing.createdAt,
+        reason: keyRequestsInPing.reason,
+        requesterName: membersInPing.name,
+        requesterEmail: membersInPing.email,
+      })
+      .from(keyRequestsInPing)
+      .innerJoin(
+        membersInPing,
+        eq(keyRequestsInPing.requesterId, membersInPing.id),
+      )
+      .where(
+        and(
+          eq(keyRequestsInPing.status, 'pending'),
+          eq(keyRequestsInPing.kind, 'holder'),
+          eq(keyRequestsInPing.targetHolderId, member.id),
+        ),
+      )
+      .orderBy(asc(keyRequestsInPing.createdAt))
+
+    incomingHolderRequests = incomingRows.map((r) => ({
+      id: r.id,
+      createdAt: r.createdAt.toISOString(),
+      requesterName: r.requesterName,
+      requesterEmail: r.requesterEmail,
+      reason: r.reason,
+    }))
+  }
+
   const assistantCanForceRetrieve =
     member.role === 'assistant' &&
     keyRow?.holderId != null &&
@@ -142,6 +198,8 @@ export async function getDashboardState(): Promise<DashboardState> {
     },
     keyWithAssistant,
     canRequestKey,
+    canRequestKeyFromHolder,
+    incomingHolderRequests,
     assistantCanForceRetrieve,
     pendingRequestId,
   }

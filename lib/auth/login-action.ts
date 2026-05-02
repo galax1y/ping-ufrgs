@@ -38,6 +38,13 @@ export async function loginAction(
     return { ok: false, error: 'Invalid email or password.' }
   }
 
+  if (row.disabled) {
+    return {
+      ok: false,
+      error: 'This account has been disabled. Contact an administrator.',
+    }
+  }
+
   await createSession({ id: row.id, role: row.role })
 
   redirect('/dashboard')

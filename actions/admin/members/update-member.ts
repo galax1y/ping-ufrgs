@@ -5,6 +5,11 @@ import { revalidatePath } from 'next/cache'
 
 import database from '@/database'
 import { membersInPing } from '@/database/drizzle/schema'
+import {
+  ASSISTANT_CONFLICT_MESSAGE,
+  hasOtherActiveAssistant,
+  isUniqueViolation,
+} from '@/actions/admin/members/assistant-slot'
 import { hashPassword } from '@/lib/auth/password'
 import { requireAdmin } from '@/lib/auth/guards'
 
@@ -57,24 +62,27 @@ export async function updateMemberAction(
     updates.passwordHash = await hashPassword(password)
   }
 
+  if (role === 'assistant' && (await hasOtherActiveAssistant(id))) {
+    return { ok: false, error: ASSISTANT_CONFLICT_MESSAGE }
+  }
+
   try {
     await database
       .update(membersInPing)
       .set(updates)
       .where(eq(membersInPing.id, id))
   } catch (e: unknown) {
-    const code =
-      e && typeof e === 'object' && 'code' in e
-        ? String((e as { code: unknown }).code)
-        : ''
-    if (code === '23505') {
+    if (isUniqueViolation(e)) {
+      if (role === 'assistant') {
+        return { ok: false, error: ASSISTANT_CONFLICT_MESSAGE }
+      }
       return {
         ok: false,
-        error:
-          'Unique constraint failed (email, enrollment, or only one assistant allowed).',
+        error: 'That email or enrollment number is already in use.',
       }
     }
-    throw e
+    console.error(e)
+    return { ok: false, error: 'Could not update the member. Try again.' }
   }
 
   revalidatePath('/admin/members')

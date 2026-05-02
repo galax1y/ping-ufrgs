@@ -22,6 +22,12 @@ export const keyRequestStatusEnum = ping.enum('key_request_status', [
   'cancelled',
 ])
 
+/** `assistant`: request to receive key from assistant/vault. `holder`: request to receive from current member/admin holder. */
+export const keyRequestKindEnum = ping.enum('key_request_kind', [
+  'assistant',
+  'holder',
+])
+
 export const keyChangeSourceEnum = ping.enum('key_change_source', [
   'request_created',
   'request_approved',
@@ -51,13 +57,17 @@ export const membersInPing = ping.table(
     updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
       .defaultNow()
       .notNull(),
+    /** When true, the account cannot sign in and is listed only under Disabled. */
+    disabled: boolean('disabled').notNull().default(false),
   },
   (table) => [
     uniqueIndex('members_email_unique').on(table.email),
     uniqueIndex('members_enrollment_number_unique').on(table.enrollmentNumber),
     uniqueIndex('members_one_assistant_idx')
       .on(table.role)
-      .where(sql`${table.role} = 'assistant'`),
+      .where(
+        sql`${table.role} = 'assistant' AND ${table.disabled} = false`,
+      ),
   ],
 )
 
@@ -94,6 +104,15 @@ export const keyRequestsInPing = ping.table(
     requesterId: uuid('requester_id')
       .notNull()
       .references(() => membersInPing.id, { onDelete: 'restrict' }),
+    kind: keyRequestKindEnum('kind').notNull().default('assistant'),
+    /**
+     * When `kind` is `holder`, the member/admin who must approve (must match
+     * key holder at creation; invalidated if custody changes).
+     */
+    targetHolderId: uuid('target_holder_id').references(
+      () => membersInPing.id,
+      { onDelete: 'restrict' },
+    ),
     status: keyRequestStatusEnum('status').notNull().default('pending'),
     reason: text('reason'),
     decidedById: uuid('decided_by').references(() => membersInPing.id, {
@@ -109,6 +128,10 @@ export const keyRequestsInPing = ping.table(
     uniqueIndex('key_requests_one_pending_per_requester_idx')
       .on(table.requesterId)
       .where(sql`${table.status} = 'pending'`),
+    check(
+      'key_requests_kind_target_chk',
+      sql`(${table.kind} = 'assistant' AND ${table.targetHolderId} IS NULL) OR (${table.kind} = 'holder' AND ${table.targetHolderId} IS NOT NULL)`,
+    ),
   ],
 )
 

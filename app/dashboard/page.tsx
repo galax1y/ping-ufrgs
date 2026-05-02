@@ -7,7 +7,10 @@ import { cn } from '@/lib/utils'
 
 import { AdminResetKeyCard } from './admin-reset-key-card'
 import { AssistantForceRetrieveCard } from './assistant-force-retrieve-card'
+import { HolderIncomingRequests } from './holder-incoming-requests'
 import { RequestKeyButton } from './request-key-button'
+import { RequestKeyFromHolderButton } from './request-key-from-holder-button'
+import { RoomToggleButton } from './room-toggle-button'
 
 export default async function DashboardPage() {
   let state
@@ -22,19 +25,25 @@ export default async function DashboardPage() {
     key,
     keyWithAssistant,
     canRequestKey,
+    canRequestKeyFromHolder,
+    incomingHolderRequests,
     assistantCanForceRetrieve,
     pendingRequestId,
     self,
     selfHoldsKey,
   } = state
 
-  const requestHint = pendingRequestId
+  const assistantRequestHint = pendingRequestId
     ? 'You already have a pending request.'
     : selfHoldsKey
       ? 'You are holding the key.'
-      : !keyWithAssistant
-        ? 'The key is not with the assistant right now.'
-        : 'The key is with the assistant. You can request it below.'
+      : 'The key is with the assistant. You can request it below.'
+
+  const holderRequestHint = pendingRequestId
+    ? 'You already have a pending request.'
+    : selfHoldsKey
+      ? 'You are holding the key.'
+      : `Ask ${key.holderName ?? 'the holder'} to pass you the key.`
 
   const keyHeadline =
     key.holderId == null ? 'Assistant' : (key.holderName ?? 'Unknown')
@@ -57,48 +66,61 @@ export default async function DashboardPage() {
   const roomS = semanticStatus(roomTone)
   const keyS = semanticStatus(keyTone)
 
+  const canToggleRoom =
+    selfHoldsKey && room != null && self.role !== 'assistant'
+  const showAssistantRequestCard =
+    self.role !== 'assistant' && !selfHoldsKey && keyWithAssistant
+  const showHolderRequestCard =
+    self.role !== 'assistant' && !selfHoldsKey && !keyWithAssistant
+
   return (
-    <div className='flex flex-col gap-5'>
-      <section
-        className={cn(
-          'relative overflow-hidden rounded-2xl border p-6 shadow-lg',
-          roomS.surfaceCard,
-        )}
-      >
-        <div
+    <div className='min-h-0 flex-1 overflow-y-auto overflow-x-hidden'>
+      <div className='flex flex-col gap-5'>
+      <div className='flex flex-col gap-3'>
+        <section
           className={cn(
-            'absolute -top-8 -right-8 size-32 rounded-full blur-2xl',
-            roomS.glow,
+            'relative overflow-hidden rounded-2xl border p-6 shadow-lg',
+            roomS.surfaceCard,
           )}
-        />
-        <div className='relative flex flex-col items-center text-center'>
+        >
           <div
             className={cn(
-              'mb-4 flex size-14 items-center justify-center rounded-2xl ring-1',
-              roomS.iconTile,
+              'absolute -top-8 -right-8 size-32 rounded-full blur-2xl',
+              roomS.glow,
             )}
-          >
-            <DoorOpen className='size-7' />
-          </div>
-          <p className='text-muted-foreground mb-1 text-[11px] font-medium tracking-[0.2em] uppercase'>
-            Room
-          </p>
-          {room ? (
-            <p
+          />
+          <div className='relative flex flex-col items-center text-center'>
+            <div
               className={cn(
-                'text-4xl font-bold tracking-tight sm:text-5xl',
-                roomS.emphasis,
+                'mb-4 flex size-14 items-center justify-center rounded-2xl ring-1',
+                roomS.iconTile,
               )}
             >
-              {room.isOpen ? 'Open' : 'Closed'}
+              <DoorOpen className='size-7' />
+            </div>
+            <p className='text-muted-foreground mb-1 text-[11px] font-medium tracking-[0.2em] uppercase'>
+              Room
             </p>
-          ) : (
-            <p className={cn('text-lg font-semibold', roomS.emphasis)}>
-              Setup needed
-            </p>
-          )}
-        </div>
-      </section>
+            {room ? (
+              <p
+                className={cn(
+                  'text-4xl font-bold tracking-tight sm:text-5xl',
+                  roomS.emphasis,
+                )}
+              >
+                {room.isOpen ? 'Open' : 'Closed'}
+              </p>
+            ) : (
+              <p className={cn('text-lg font-semibold', roomS.emphasis)}>
+                Setup needed
+              </p>
+            )}
+          </div>
+        </section>
+        {canToggleRoom ? (
+          <RoomToggleButton isOpen={room!.isOpen} />
+        ) : null}
+      </div>
 
       <section
         className={cn(
@@ -145,17 +167,20 @@ export default async function DashboardPage() {
 
       {self.role === 'admin' ? <AdminResetKeyCard /> : null}
 
-      {self.role === 'assistant' ? (
-        <AssistantForceRetrieveCard
-          canRetrieve={assistantCanForceRetrieve}
-          currentHolderName={key.holderName}
-        />
-      ) : (
+      {self.role === 'assistant' && assistantCanForceRetrieve ? (
+        <AssistantForceRetrieveCard currentHolderName={key.holderName} />
+      ) : null}
+
+      {incomingHolderRequests.length > 0 ? (
+        <HolderIncomingRequests initialRequests={incomingHolderRequests} />
+      ) : null}
+
+      {showAssistantRequestCard ? (
         <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
           <div className='space-y-1'>
             <p className='text-sm font-medium'>Request key from assistant</p>
             <p className='text-muted-foreground text-xs text-pretty'>
-              {requestHint}
+              {assistantRequestHint}
             </p>
           </div>
           <RequestKeyButton
@@ -163,7 +188,24 @@ export default async function DashboardPage() {
             pending={pendingRequestId != null}
           />
         </div>
-      )}
+      ) : null}
+
+      {showHolderRequestCard && key.holderId ? (
+        <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
+          <div className='space-y-1'>
+            <p className='text-sm font-medium'>Request key from holder</p>
+            <p className='text-muted-foreground text-xs text-pretty'>
+              {holderRequestHint}
+            </p>
+          </div>
+          <RequestKeyFromHolderButton
+            canRequest={canRequestKeyFromHolder}
+            pending={pendingRequestId != null}
+            holderName={key.holderName ?? 'holder'}
+          />
+        </div>
+      ) : null}
+      </div>
     </div>
   )
 }

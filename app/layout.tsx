@@ -36,7 +36,7 @@ export default function RootLayout({
       <body className='min-h-screen font-sans antialiased'>
         <ThemeProvider>
           <AppShell>{children}</AppShell>
-          <Toaster richColors position='top-center' closeButton />
+          <Toaster richColors position='bottom-right' closeButton />
         </ThemeProvider>
       </body>
     </html>

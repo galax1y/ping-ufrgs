@@ -69,12 +69,18 @@ export async function getSession(): Promise<{ member: PublicMember | null }> {
         email: membersInPing.email,
         enrollmentNumber: membersInPing.enrollmentNumber,
         role: membersInPing.role,
+        disabled: membersInPing.disabled,
       })
       .from(membersInPing)
       .where(eq(membersInPing.id, id))
       .limit(1)
 
     if (!row) {
+      await destroySession()
+      return { member: null }
+    }
+
+    if (row.disabled) {
       await destroySession()
       return { member: null }
     }

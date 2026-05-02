@@ -12,6 +12,9 @@ export const membersInPingRelations = relations(membersInPing, ({ one, many }) =
   keyRequestsAsRequester: many(keyRequestsInPing, {
     relationName: 'keyRequestRequester',
   }),
+  keyRequestsAsTargetHolder: many(keyRequestsInPing, {
+    relationName: 'keyRequestTargetHolder',
+  }),
   keyRequestsDecided: many(keyRequestsInPing, {
     relationName: 'keyRequestDecider',
   }),
@@ -53,6 +56,11 @@ export const keyRequestsInPingRelations = relations(keyRequestsInPing, ({ one, m
   requester: one(membersInPing, {
     relationName: 'keyRequestRequester',
     fields: [keyRequestsInPing.requesterId],
+    references: [membersInPing.id],
+  }),
+  targetHolder: one(membersInPing, {
+    relationName: 'keyRequestTargetHolder',
+    fields: [keyRequestsInPing.targetHolderId],
     references: [membersInPing.id],
   }),
   decider: one(membersInPing, {

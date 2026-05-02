@@ -85,6 +85,7 @@ export async function forceRetrieveKeyAction(): Promise<ForceRetrieveKeyResult> 
 
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/key-requests')
+  revalidatePath('/dashboard/history')
   revalidatePath('/admin/members')
   return { ok: true }
 }

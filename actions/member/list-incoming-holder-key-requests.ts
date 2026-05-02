@@ -4,21 +4,15 @@ import { and, asc, eq } from 'drizzle-orm'
 
 import database from '@/database'
 import { keyRequestsInPing, membersInPing } from '@/database/drizzle/schema'
-import { requireAssistant } from '@/lib/auth/guards'
+import type { IncomingHolderKeyRequestRow } from '@/actions/member/get-dashboard-state'
+import { requireAuth } from '@/lib/auth/guards'
 
-export type PendingKeyRequestRow = {
-  id: string
-  /** ISO string (serializable to client components). */
-  createdAt: string
-  requesterName: string
-  requesterEmail: string
-  reason: string | null
-}
+export type { IncomingHolderKeyRequestRow }
 
-export async function listPendingKeyRequestsAction(): Promise<
-  PendingKeyRequestRow[]
+export async function listIncomingHolderKeyRequestsAction(): Promise<
+  IncomingHolderKeyRequestRow[]
 > {
-  await requireAssistant()
+  const member = await requireAuth()
 
   const rows = await database
     .select({
@@ -36,13 +30,17 @@ export async function listPendingKeyRequestsAction(): Promise<
     .where(
       and(
         eq(keyRequestsInPing.status, 'pending'),
-        eq(keyRequestsInPing.kind, 'assistant'),
+        eq(keyRequestsInPing.kind, 'holder'),
+        eq(keyRequestsInPing.targetHolderId, member.id),
       ),
     )
     .orderBy(asc(keyRequestsInPing.createdAt))
 
   return rows.map((r) => ({
-    ...r,
+    id: r.id,
     createdAt: r.createdAt.toISOString(),
+    requesterName: r.requesterName,
+    requesterEmail: r.requesterEmail,
+    reason: r.reason,
   }))
 }

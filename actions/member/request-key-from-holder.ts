@@ -1,0 +1,139 @@
+'use server'
+
+import { and, eq } from 'drizzle-orm'
+import { revalidatePath } from 'next/cache'
+
+import database from '@/database'
+import {
+  keyOwnershipLogInPing,
+  keyRequestsInPing,
+  keyStateInPing,
+  membersInPing,
+} from '@/database/drizzle/schema'
+import { requireAuth } from '@/lib/auth/guards'
+import { isSameMember } from '@/lib/member-ids'
+
+export type RequestKeyFromHolderResult =
+  | { ok: true }
+  | { ok: false; error: string }
+
+/**
+ * Member/admin asks the current non-assistant key holder to transfer the key.
+ * Assistants must use vault/retrieve flows instead.
+ */
+export async function requestKeyFromHolderAction(
+  reason: string,
+): Promise<RequestKeyFromHolderResult> {
+  const member = await requireAuth()
+
+  if (member.role === 'assistant') {
+    return {
+      ok: false,
+      error:
+        'Assistants cannot use this request. Use assistant tools on the dashboard.',
+    }
+  }
+
+  try {
+    const result = await database.transaction(
+      async (tx): Promise<{ ok: true } | { error: string }> => {
+        const [keyRow] = await tx
+          .select()
+          .from(keyStateInPing)
+          .where(eq(keyStateInPing.id, 1))
+          .limit(1)
+
+        if (isSameMember(keyRow?.holderId, member.id)) {
+          return { error: 'You already have the key.' }
+        }
+
+        let holderRole: 'admin' | 'member' | 'assistant' | null = null
+        if (keyRow?.holderId) {
+          const [h] = await tx
+            .select({ role: membersInPing.role })
+            .from(membersInPing)
+            .where(eq(membersInPing.id, keyRow.holderId))
+            .limit(1)
+          holderRole = h?.role ?? null
+        }
+
+        const keyWithAssistant =
+          keyRow?.holderId == null || holderRole === 'assistant'
+
+        if (keyWithAssistant) {
+          return {
+            error:
+              'The key is with the assistant. Request it from the assistant instead.',
+          }
+        }
+
+        const targetHolderId = keyRow!.holderId!
+
+        const [existing] = await tx
+          .select({ id: keyRequestsInPing.id })
+          .from(keyRequestsInPing)
+          .where(
+            and(
+              eq(keyRequestsInPing.requesterId, member.id),
+              eq(keyRequestsInPing.status, 'pending'),
+            ),
+          )
+          .limit(1)
+
+        if (existing) {
+          return { error: 'You already have a pending request.' }
+        }
+
+        const trimmedReason = reason.trim() || null
+
+        const [inserted] = await tx
+          .insert(keyRequestsInPing)
+          .values({
+            requesterId: member.id,
+            kind: 'holder',
+            targetHolderId,
+            reason: trimmedReason,
+            status: 'pending',
+          })
+          .returning({ id: keyRequestsInPing.id })
+
+        if (!inserted?.id) {
+          throw new Error('INSERT_FAILED')
+        }
+
+        await tx.insert(keyOwnershipLogInPing).values({
+          previousHolderId: null,
+          newHolderId: null,
+          source: 'request_created',
+          actorId: member.id,
+          requestId: inserted.id,
+          note: trimmedReason,
+        })
+
+        return { ok: true }
+      },
+    )
+
+    if ('error' in result) {
+      return { ok: false, error: result.error }
+    }
+  } catch (e: unknown) {
+    const code =
+      e && typeof e === 'object' && 'code' in e
+        ? String((e as { code: unknown }).code)
+        : ''
+    if (code === '23505') {
+      return { ok: false, error: 'You already have a pending request.' }
+    }
+    if (e instanceof Error && e.message === 'INSERT_FAILED') {
+      return { ok: false, error: 'Could not create the request. Try again.' }
+    }
+    console.error(e)
+    return { ok: false, error: 'Could not create the request. Try again.' }
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/key-requests')
+  revalidatePath('/dashboard/history')
+  return { ok: true }
+}

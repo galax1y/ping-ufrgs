@@ -81,6 +81,8 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
         .insert(keyRequestsInPing)
         .values({
           requesterId: member.id,
+          kind: 'assistant',
+          targetHolderId: null,
           reason: trimmedReason,
           status: 'pending',
         })
@@ -122,5 +124,6 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
 
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/key-requests')
+  revalidatePath('/dashboard/history')
   return { ok: true }
 }

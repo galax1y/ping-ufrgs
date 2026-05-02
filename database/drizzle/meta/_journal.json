@@ -15,6 +15,20 @@
       "when": 1777748326590,
       "tag": "0001_key_change_request_created",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777748326591,
+      "tag": "0002_key_request_kind",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777748326592,
+      "tag": "0003_member_disabled",
+      "breakpoints": true
     }
   ]
 }

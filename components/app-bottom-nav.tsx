@@ -3,7 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { LucideIcon } from 'lucide-react'
-import { ClipboardList, LayoutGrid, LogOut, Users } from 'lucide-react'
+import {
+  ClipboardList,
+  History,
+  LayoutGrid,
+  LogOut,
+  Users,
+} from 'lucide-react'
 
 import { logoutAction } from '@/lib/auth/logout-action'
 import { FooterThemeToggle } from '@/components/footer-theme-toggle'
@@ -14,12 +20,19 @@ function NavItem({
   label,
   icon: Icon,
   active,
+  badgeCount,
 }: {
   href: string
   label: string
   icon: LucideIcon
   active: boolean
+  /** Pending notification count (e.g. key requests). */
+  badgeCount?: number
 }) {
+  const showBadge =
+    typeof badgeCount === 'number' && badgeCount > 0
+  const badgeLabel = badgeCount! > 99 ? '99+' : String(badgeCount)
+
   return (
     <Link
       href={href}
@@ -30,7 +43,17 @@ function NavItem({
           : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
       )}
     >
-      <Icon className='size-5' strokeWidth={active ? 2.25 : 2} />
+      <span className='relative inline-flex'>
+        <Icon className='size-5' strokeWidth={active ? 2.25 : 2} />
+        {showBadge ? (
+          <span
+            className='bg-destructive text-destructive-foreground ring-background absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] leading-none font-bold shadow-sm ring-2'
+            aria-label={`${badgeCount} pending`}
+          >
+            {badgeLabel}
+          </span>
+        ) : null}
+      </span>
       {label}
     </Link>
   )
@@ -39,17 +62,20 @@ function NavItem({
 export function AppBottomNav({
   isAdmin,
   isAssistant,
+  pendingKeyRequestCount = 0,
 }: {
   isAdmin: boolean
   isAssistant: boolean
+  /** Pending key requests (assistants only; shown on Requests tab). */
+  pendingKeyRequestCount?: number
 }) {
   const pathname = usePathname()
   const onStatus = pathname === '/dashboard'
+  const onHistory = pathname.startsWith('/dashboard/history')
   const onRequests = pathname.startsWith('/dashboard/key-requests')
   const onAdmin = pathname.startsWith('/admin')
 
-  const showSecondary = isAdmin || isAssistant
-  const gridCols = showSecondary ? 'grid-cols-4' : 'grid-cols-3'
+  const gridCols = isAdmin || isAssistant ? 'grid-cols-5' : 'grid-cols-4'
 
   return (
     <nav
@@ -82,8 +108,15 @@ export function AppBottomNav({
             label='Requests'
             icon={ClipboardList}
             active={onRequests}
+            badgeCount={pendingKeyRequestCount}
           />
         ) : null}
+        <NavItem
+          href='/dashboard/history'
+          label='History'
+          icon={History}
+          active={onHistory}
+        />
         <FooterThemeToggle />
         <form action={logoutAction} className='flex h-full min-h-0'>
           <button
