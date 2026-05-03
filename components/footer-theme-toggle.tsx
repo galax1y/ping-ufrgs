@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 export function FooterThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const isDark = resolvedTheme === 'dark'
 
   useEffect(() => {
     setMounted(true)
@@ -24,26 +25,25 @@ export function FooterThemeToggle() {
     return (
       <div className={baseClass} aria-hidden>
         <span className='size-5' />
-        Theme
+        <p>{isDark ? 'light' : 'dark'}</p>
       </div>
     )
   }
 
-  const isDark = resolvedTheme === 'dark'
 
   return (
     <button
       type='button'
       className={baseClass}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDark ? 'Trocar para light mode' : 'Trocar para dark mode'}
     >
       {isDark ? (
         <Sun className='size-5' strokeWidth={2} />
       ) : (
         <Moon className='size-5' strokeWidth={2} />
       )}
-      Theme
+      Tema
     </button>
   )
 }

@@ -90,14 +90,14 @@ export function AppBottomNav({
       >
         <NavItem
           href='/dashboard'
-          label='Status'
+          label='Dashboard'
           icon={LayoutGrid}
           active={onStatus}
         />
         {isAdmin ? (
           <NavItem
             href='/admin/members'
-            label='Members'
+            label='Membros'
             icon={Users}
             active={onAdmin}
           />
@@ -105,7 +105,7 @@ export function AppBottomNav({
         {isAssistant ? (
           <NavItem
             href='/dashboard/key-requests'
-            label='Requests'
+            label='Requisicoes'
             icon={ClipboardList}
             active={onRequests}
             badgeCount={pendingKeyRequestCount}
@@ -113,7 +113,7 @@ export function AppBottomNav({
         ) : null}
         <NavItem
           href='/dashboard/history'
-          label='History'
+          label='Historico'
           icon={History}
           active={onHistory}
         />
@@ -124,7 +124,7 @@ export function AppBottomNav({
             className='text-muted-foreground hover:bg-muted/80 hover:text-foreground flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-xl py-1 text-[10px] font-medium transition-colors'
           >
             <LogOut className='size-5' />
-            Out
+            Sair
           </button>
         </form>
       </div>

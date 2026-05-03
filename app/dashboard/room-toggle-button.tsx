@@ -20,7 +20,7 @@ export function RoomToggleButton({ isOpen }: { isOpen: boolean }) {
         startTransition(async () => {
           const r = await toggleRoomStateAction()
           if (r.ok) {
-            toast.success(r.isOpen ? 'Room marked open.' : 'Room marked closed.')
+            toast.success(r.isOpen ? 'Sala aberta!' : 'Sala fechada!')
             router.refresh()
           } else {
             toast.error(r.error)
@@ -62,25 +62,25 @@ export function RoomToggleButton({ isOpen }: { isOpen: boolean }) {
         </div>
         <div className='min-w-0 flex-1'>
           <p className='text-sm font-semibold tracking-tight'>
-            {isOpen ? 'Room is open' : 'Room is closed'}
+            {isOpen ? 'Sala Aberta' : 'Sala fechada'}
           </p>
           <p className='text-muted-foreground mt-0.5 text-xs leading-snug'>
             {pending
-              ? 'Updating status…'
+              ? 'Atualizando status da sala...'
               : isOpen
-                ? 'Tap to lock up and mark the room closed.'
-                : 'Tap to open the room for access.'}
+                ? 'Clique para marcar a sala como "Fechada".'
+                : 'Clique para marcar a sala como "Aberta".'}
           </p>
         </div>
         <div
           className={cn(
             'shrink-0 rounded-full px-3.5 py-2 text-xs font-semibold tracking-wide transition-colors',
             isOpen
-              ? 'bg-amber-500/20 text-amber-200 ring-1 ring-amber-500/30'
-              : 'bg-emerald-500/20 text-emerald-100 ring-1 ring-emerald-500/35',
+              ? 'bg-amber-500/20 text-amber-500 ring-1 ring-amber-500/30'
+              : 'bg-emerald-500/20 text-emerald-500 ring-1 ring-emerald-500/35',
           )}
         >
-          {pending ? '…' : isOpen ? 'Close' : 'Open'}
+          {pending ? '…' : isOpen ? 'Fechar' : 'Abrir'}
         </div>
       </div>
     </button>

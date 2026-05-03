@@ -1,4 +1,4 @@
-# ping-ufrgs
+# KeyPET
 
 A [Next.js](https://nextjs.org) project.
 

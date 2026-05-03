@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Ping UFRGS',
-  description: 'Room key and access',
+  title: 'KeyPET',
+  description: 'Gerenciamento de status de chave e sala',
 }
 
 export default function RootLayout({
