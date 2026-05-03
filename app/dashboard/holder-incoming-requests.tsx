@@ -23,10 +23,9 @@ export function HolderIncomingRequests({
   return (
     <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
       <div className='space-y-1'>
-        <p className='text-sm font-medium'>Key requests for you</p>
+        <p className='text-sm font-medium'>Requisições de chave</p>
         <p className='text-muted-foreground text-xs text-pretty'>
-          Members asked you for the key. Accepting hands the key to them and
-          updates the log; other pending requests are cancelled.
+          Membros fazem requisições pela posse da chave. Aceitar transfere a posse da chave para ele, enquanto as outras requisições pendentes são canceladas.
         </p>
       </div>
       <ul className='space-y-3'>
@@ -69,7 +68,7 @@ export function HolderIncomingRequests({
                 })
               }}
             >
-              Accept
+              Aceitar
             </Button>
           </li>
         ))}

@@ -19,7 +19,7 @@ export function AssistantPendingRequests({
   if (initialRequests.length === 0) {
     return (
       <div className='border-border/50 bg-card/60 rounded-2xl border p-4 shadow-sm'>
-        <p className='text-muted-foreground text-sm'>No pending requests.</p>
+        <p className='text-muted-foreground text-sm'>Sem requisições pendentes.</p>
       </div>
     )
   }
@@ -27,8 +27,7 @@ export function AssistantPendingRequests({
   return (
     <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
       <p className='text-muted-foreground text-xs text-pretty'>
-        Accepting transfers the key and records it in the log. Other pending
-        requests are cancelled.
+        Membros fazem requisições pela posse da chave. Aceitar transfere a posse da chave para ele, enquanto as outras requisições pendentes são canceladas.
       </p>
       <ul className='space-y-3'>
         {initialRequests.map((r) => (
@@ -70,7 +69,7 @@ export function AssistantPendingRequests({
                 })
               }}
             >
-              Accept
+              Aceitar
             </Button>
           </li>
         ))}

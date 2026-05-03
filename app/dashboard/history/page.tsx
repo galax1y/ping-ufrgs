@@ -64,7 +64,7 @@ function HistoryEventList({
               className={cn(
                 'flex items-start gap-2 px-2.5 py-2 sm:gap-2.5 sm:px-3',
                 isLatestConcrete &&
-                  'bg-primary/10 ring-primary/25 ring-1 ring-inset',
+                'bg-primary/10 ring-primary/25 ring-1 ring-inset',
               )}
               aria-current={isLatestConcrete ? 'true' : undefined}
             >
@@ -144,10 +144,10 @@ export default async function HistoryPage({
     <div className='flex min-h-0 flex-1 flex-col gap-4 overflow-hidden sm:gap-6'>
       <div className='shrink-0'>
         <h1 className='text-xl font-semibold tracking-tight'>
-          Activity history
+          Histórico de atividades
         </h1>
         <p className='text-muted-foreground mt-1 text-sm text-pretty'>
-          Who did what and when — key custody and room open/close events.
+          Transações de posse de chave e eventos de abrir/fechar a sala.
         </p>
       </div>
 
@@ -163,13 +163,13 @@ export default async function HistoryPage({
             <span className='bg-primary/15 text-primary flex size-7 items-center justify-center rounded-md'>
               <KeyRound className='size-3' />
             </span>
-            Key custody
+            Posse de chave
           </TabsTrigger>
           <TabsTrigger value='room' className='gap-1.5 px-2.5 py-1.5 text-xs'>
             <span className='bg-primary/15 text-primary flex size-7 items-center justify-center rounded-md'>
               <DoorOpen className='size-3' />
             </span>
-            Room
+            Sala
           </TabsTrigger>
         </TabsList>
 
