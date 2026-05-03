@@ -52,7 +52,7 @@ export default async function DashboardPage() {
     key.holderId != null && key.holderRole
       ? key.holderRole.charAt(0).toUpperCase() + key.holderRole.slice(1)
       : key.holderId == null
-        ? 'Vault'
+        ? 'Secretaria'
         : null
 
   const roomTone: SemanticStatusTone = !room
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
               <DoorOpen className='size-7' />
             </div>
             <p className='text-muted-foreground mb-1 text-[11px] font-medium tracking-[0.2em] uppercase'>
-              Room
+              Status da Sala
             </p>
             {room ? (
               <p
@@ -108,7 +108,7 @@ export default async function DashboardPage() {
                   roomS.emphasis,
                 )}
               >
-                {room.isOpen ? 'Open' : 'Closed'}
+                {room.isOpen ? 'Aberta' : 'Fechada'}
               </p>
             ) : (
               <p className={cn('text-lg font-semibold', roomS.emphasis)}>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
             <KeyRound className='size-7' />
           </div>
           <p className='text-muted-foreground mb-1 text-[11px] font-medium tracking-[0.2em] uppercase'>
-            Key
+            Status da Chave
           </p>
           <p
             className={cn(
@@ -156,11 +156,6 @@ export default async function DashboardPage() {
           </p>
           {keySub ? (
             <p className={cn('mt-1 text-sm', keyS.subtitleSoft)}>{keySub}</p>
-          ) : null}
-          {!keyWithAssistant && !selfHoldsKey ? (
-            <p className='text-muted-foreground mt-3 max-w-[240px] text-xs'>
-              With someone else — request unavailable
-            </p>
           ) : null}
         </div>
       </section>
