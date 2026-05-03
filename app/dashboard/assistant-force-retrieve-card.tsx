@@ -20,44 +20,55 @@ import { Button } from '@/components/ui/button'
 
 export function AssistantForceRetrieveCard({
   currentHolderName,
+  currentHolderRole,
 }: {
   currentHolderName: string | null
+  currentHolderRole: string | null
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [pending, setPending] = useState(false)
 
-  const holderLabel = currentHolderName?.trim() || 'the current holder'
+  const translatedRole =
+    currentHolderRole === 'admin'
+      ? 'Admin'
+      : currentHolderRole === 'member'
+        ? 'Membro'
+        : currentHolderRole === 'assistant'
+          ? 'Secretaria'
+          : null
+
+  const roleSuffix = translatedRole ? ` (${translatedRole})` : ''
+  const holderLabel = currentHolderName?.trim()
+    ? `${currentHolderName.trim()}${roleSuffix}`
+    : 'um membro'
 
   return (
     <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
       <div className='space-y-1'>
-        <p className='text-sm font-medium'>Retrieve key (assistant)</p>
+        <p className='text-sm font-medium'>Registrar devolução da chave</p>
         <p className='text-muted-foreground text-xs text-pretty'>
-          The key is with {holderLabel}. You can take it back without a member
-          request. This is logged.
+          A chave está em posse de {holderLabel}
         </p>
       </div>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
           <Button className='w-full' variant='secondary' type='button'>
-            Retrieve key from holder
+            Chave devolvida
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Retrieve the key?</AlertDialogTitle>
+            <AlertDialogTitle>Registrar devolução da chave?</AlertDialogTitle>
             <AlertDialogDescription>
-              The key will be transferred to you immediately and recorded in the
-              ownership log. Pending key requests will be cancelled. This is
-              meant when you must take the key back from {holderLabel}.
+              A posse da chave será transferida para você e isso será registrado no histórico de posse de chaves.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button
-                variant='destructive'
+                variant='ghost'
                 disabled={pending}
                 type='button'
                 onClick={async (e) => {
@@ -66,7 +77,7 @@ export function AssistantForceRetrieveCard({
                   const r = await forceRetrieveKeyAction()
                   setPending(false)
                   if (r.ok) {
-                    toast.success('Key retrieved. Log updated.')
+                    toast.success('Chave devolvida. Histórico atualizado.')
                     setOpen(false)
                     router.refresh()
                   } else {
@@ -74,7 +85,7 @@ export function AssistantForceRetrieveCard({
                   }
                 }}
               >
-                Yes, retrieve key
+                Sim, registrar devolução
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
