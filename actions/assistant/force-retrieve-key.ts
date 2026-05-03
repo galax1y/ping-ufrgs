@@ -65,7 +65,7 @@ export async function forceRetrieveKeyAction(): Promise<ForceRetrieveKeyResult> 
         source: 'assistant_return',
         actorId: assistant.id,
         requestId: null,
-        note: 'Assistant forcibly retrieved the key from the current holder',
+        note: 'Secretaria registrou devolução da chave',
       })
     })
   } catch (e) {

@@ -26,32 +26,29 @@ export function AdminResetKeyCard() {
   return (
     <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border border-amber-500/25 p-4 shadow-sm'>
       <div className='space-y-1'>
-        <p className='text-sm font-medium'>Admin · Key custody</p>
+        <p className='text-sm font-medium text-amber-500 '>Ação de admin</p>
         <p className='text-muted-foreground text-xs text-pretty'>
-          Return the key to assistant possession (vault). Pending key requests
-          are cancelled. This is logged.
+          Restaurar a chave para a posse da secreatria. Requisições pendentes serão rejeitadas.
         </p>
       </div>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
           <Button className='w-full' variant='outline' type='button'>
-            Reset key to vault
+            Restaurar
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset key to vault?</AlertDialogTitle>
+            <AlertDialogTitle>Restaurar posse da chave?</AlertDialogTitle>
             <AlertDialogDescription>
-              The key will leave whoever holds it and go back to assistant
-              custody. All pending requests will be cancelled. The action is
-              recorded in the ownership log.
+              Restaurar a chave para a posse da secreatria. Requisições pendentes serão rejeitadas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button
-                variant='destructive'
+                variant='ghost'
                 disabled={pending}
                 type='button'
                 onClick={async (e) => {
@@ -60,7 +57,7 @@ export function AdminResetKeyCard() {
                   const r = await resetKeyToVaultAction()
                   setPending(false)
                   if (r.ok) {
-                    toast.success('Key returned to vault.')
+                    toast.success('Chave restaurada.')
                     setOpen(false)
                     router.refresh()
                   } else {
@@ -68,7 +65,7 @@ export function AdminResetKeyCard() {
                   }
                 }}
               >
-                Reset key
+                Restaurar chave
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>

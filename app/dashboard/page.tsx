@@ -34,13 +34,13 @@ export default async function DashboardPage() {
   } = state
 
   const assistantRequestHint = pendingRequestId
-    ? 'You already have a pending request.'
+    ? 'Você já tem um requisição pendente.'
     : selfHoldsKey
       ? 'You are holding the key.'
       : 'The key is with the assistant. You can request it below.'
 
   const holderRequestHint = pendingRequestId
-    ? 'You already have a pending request.'
+    ? 'Você já tem um requisição pendente.'
     : selfHoldsKey
       ? 'You are holding the key.'
       : `Ask ${key.holderName ?? 'the holder'} to pass you the key.`
@@ -181,7 +181,7 @@ export default async function DashboardPage() {
         {showHolderRequestCard && key.holderId ? (
           <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
             <div className='space-y-1'>
-              <p className='text-sm font-medium'>Request key from holder</p>
+              <p className='text-sm font-medium'>Requisitar chave</p>
               <p className='text-muted-foreground text-xs text-pretty'>
                 {holderRequestHint}
               </p>

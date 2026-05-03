@@ -57,10 +57,10 @@ export function HistoryPagination({
           'No entries in this log.'
         ) : (
           <>
-            Showing {showingFrom}–{showingTo} of {total}
+            Mostrando {showingFrom}–{showingTo} de {total}
             <span className='text-muted-foreground/80 hidden sm:inline'>
               {' '}
-              · Page {page} of {totalPages}
+              · Página {page} de {totalPages}
             </span>
           </>
         )}
@@ -76,7 +76,7 @@ export function HistoryPagination({
             >
               <Link href={prevHref} prefetch={false}>
                 <ChevronLeft className='size-3.5' />
-                Previous
+                Anterior
               </Link>
             </Button>
           ) : (
@@ -87,7 +87,7 @@ export function HistoryPagination({
               disabled
             >
               <ChevronLeft className='size-3.5' />
-              Previous
+              Anterior
             </Button>
           )}
           {canNext ? (
@@ -98,7 +98,7 @@ export function HistoryPagination({
               asChild
             >
               <Link href={nextHref} prefetch={false}>
-                Next
+                Próximo
                 <ChevronRight className='size-3.5' />
               </Link>
             </Button>
@@ -109,7 +109,7 @@ export function HistoryPagination({
               className='h-7 gap-1 px-2 text-xs'
               disabled
             >
-              Next
+              Próximo
               <ChevronRight className='size-3.5' />
             </Button>
           )}

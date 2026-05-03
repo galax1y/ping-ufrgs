@@ -81,7 +81,7 @@ export async function requestKeyFromHolderAction(
           .limit(1)
 
         if (existing) {
-          return { error: 'You already have a pending request.' }
+          return { error: 'Você já tem um requisição pendente.' }
         }
 
         const trimmedReason = reason.trim() || null
@@ -123,7 +123,7 @@ export async function requestKeyFromHolderAction(
         ? String((e as { code: unknown }).code)
         : ''
     if (code === '23505') {
-      return { ok: false, error: 'You already have a pending request.' }
+      return { ok: false, error: 'Você já tem um requisição pendente.' }
     }
     if (e instanceof Error && e.message === 'INSERT_FAILED') {
       return { ok: false, error: 'Could not create the request. Try again.' }

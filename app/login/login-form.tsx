@@ -35,16 +35,14 @@ export function LoginForm() {
         <div className='absolute top-4 right-4'>
           <ThemeToggle />
         </div>
-        <CardTitle className='text-xl tracking-tight sm:text-2xl'>Log in</CardTitle>
-        <CardDescription className='text-pretty pr-10'>
-          Sign in with the credentials your administrator gave you.
-        </CardDescription>
+        <CardTitle className='text-xl tracking-tight sm:text-2xl'>Login | KeyPET</CardTitle>
+
       </CardHeader>
       <CardContent className='space-y-4'>
         {!state.ok ? (
           <Alert variant='destructive'>
             <AlertCircle className='size-4' />
-            <AlertTitle>Could not sign in</AlertTitle>
+            <AlertTitle>Não foi possível realizar o login</AlertTitle>
             <AlertDescription>{state.error}</AlertDescription>
           </Alert>
         ) : null}
@@ -83,7 +81,7 @@ export function LoginForm() {
       </CardContent>
       <CardFooter className='flex justify-center border-t border-border/50 pt-6'>
         <FieldDescription className='text-center text-pretty'>
-          Need an account? Ask an organization admin to create one for you.
+          Ainda sem acesso? Entre em contato com um admin para criar sua conta!
         </FieldDescription>
       </CardFooter>
     </Card>

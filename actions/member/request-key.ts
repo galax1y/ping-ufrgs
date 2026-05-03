@@ -30,79 +30,79 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
   try {
     const result = await database.transaction(
       async (tx): Promise<{ ok: true } | { error: string }> => {
-      const [keyRow] = await tx
-        .select()
-        .from(keyStateInPing)
-        .where(eq(keyStateInPing.id, 1))
-        .limit(1)
-
-      if (isSameMember(keyRow?.holderId, member.id)) {
-        return { error: 'You already have the key.' }
-      }
-
-      let holderRole: 'admin' | 'member' | 'assistant' | null = null
-      if (keyRow?.holderId) {
-        const [h] = await tx
-          .select({ role: membersInPing.role })
-          .from(membersInPing)
-          .where(eq(membersInPing.id, keyRow.holderId))
+        const [keyRow] = await tx
+          .select()
+          .from(keyStateInPing)
+          .where(eq(keyStateInPing.id, 1))
           .limit(1)
-        holderRole = h?.role ?? null
-      }
 
-      const keyWithAssistant =
-        keyRow?.holderId == null || holderRole === 'assistant'
-
-      if (!keyWithAssistant) {
-        return {
-          error:
-            'The key is not with the assistant right now. Ask the current holder.',
+        if (isSameMember(keyRow?.holderId, member.id)) {
+          return { error: 'You already have the key.' }
         }
-      }
 
-      const [existing] = await tx
-        .select({ id: keyRequestsInPing.id })
-        .from(keyRequestsInPing)
-        .where(
-          and(
-            eq(keyRequestsInPing.requesterId, member.id),
-            eq(keyRequestsInPing.status, 'pending'),
-          ),
-        )
-        .limit(1)
+        let holderRole: 'admin' | 'member' | 'assistant' | null = null
+        if (keyRow?.holderId) {
+          const [h] = await tx
+            .select({ role: membersInPing.role })
+            .from(membersInPing)
+            .where(eq(membersInPing.id, keyRow.holderId))
+            .limit(1)
+          holderRole = h?.role ?? null
+        }
 
-      if (existing) {
-        return { error: 'You already have a pending request.' }
-      }
+        const keyWithAssistant =
+          keyRow?.holderId == null || holderRole === 'assistant'
 
-      const trimmedReason = reason.trim() || null
+        if (!keyWithAssistant) {
+          return {
+            error:
+              'The key is not with the assistant right now. Ask the current holder.',
+          }
+        }
 
-      const [inserted] = await tx
-        .insert(keyRequestsInPing)
-        .values({
-          requesterId: member.id,
-          kind: 'assistant',
-          targetHolderId: null,
-          reason: trimmedReason,
-          status: 'pending',
+        const [existing] = await tx
+          .select({ id: keyRequestsInPing.id })
+          .from(keyRequestsInPing)
+          .where(
+            and(
+              eq(keyRequestsInPing.requesterId, member.id),
+              eq(keyRequestsInPing.status, 'pending'),
+            ),
+          )
+          .limit(1)
+
+        if (existing) {
+          return { error: 'Você já tem um requisição pendente.' }
+        }
+
+        const trimmedReason = reason.trim() || null
+
+        const [inserted] = await tx
+          .insert(keyRequestsInPing)
+          .values({
+            requesterId: member.id,
+            kind: 'assistant',
+            targetHolderId: null,
+            reason: trimmedReason,
+            status: 'pending',
+          })
+          .returning({ id: keyRequestsInPing.id })
+
+        if (!inserted?.id) {
+          throw new Error('INSERT_FAILED')
+        }
+
+        await tx.insert(keyOwnershipLogInPing).values({
+          previousHolderId: null,
+          newHolderId: null,
+          source: 'request_created',
+          actorId: member.id,
+          requestId: inserted.id,
+          note: trimmedReason,
         })
-        .returning({ id: keyRequestsInPing.id })
 
-      if (!inserted?.id) {
-        throw new Error('INSERT_FAILED')
-      }
-
-      await tx.insert(keyOwnershipLogInPing).values({
-        previousHolderId: null,
-        newHolderId: null,
-        source: 'request_created',
-        actorId: member.id,
-        requestId: inserted.id,
-        note: trimmedReason,
+        return { ok: true }
       })
-
-      return { ok: true }
-    })
 
     if ('error' in result) {
       return { ok: false, error: result.error }
@@ -113,7 +113,7 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
         ? String((e as { code: unknown }).code)
         : ''
     if (code === '23505') {
-      return { ok: false, error: 'You already have a pending request.' }
+      return { ok: false, error: 'Você já tem um requisição pendente.' }
     }
     if (e instanceof Error && e.message === 'INSERT_FAILED') {
       return { ok: false, error: 'Could not create the request. Try again.' }

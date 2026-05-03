@@ -12,7 +12,6 @@ import {
 import { requireAuth } from '@/lib/auth/guards'
 import { HISTORY_PAGE_SIZE } from '@/lib/history-pagination'
 
-const VAULT = 'the vault'
 
 export type KeyHistoryItem = {
   id: number
@@ -34,27 +33,27 @@ export type RoomHistoryItem = {
 
 function labelKeySource(source: string): string {
   const labels: Record<string, string> = {
-    request_created: 'Request',
-    request_approved: 'Approval',
-    member_trade: 'Transfer',
-    assistant_return: 'Assistant',
+    request_created: 'Solicitação',
+    request_approved: 'Aprovação',
+    member_trade: 'Transferência',
+    assistant_return: 'Assistente',
     admin_action: 'Admin',
-    initial: 'Initial',
+    initial: 'Inicial',
   }
   return labels[source] ?? source
 }
 
 function labelRoomSource(source: string): string {
-  return source === 'admin_override' ? 'Admin override' : 'Key holder'
+  return source === 'admin_override' ? 'Sobrescrição de Admin' : 'Portador da chave'
 }
 
 function holderLabel(
   id: string | null | undefined,
   name: string | null | undefined,
 ): string {
-  if (id == null) return VAULT
+  if (id == null) return ""
   const n = name?.trim()
-  return n || 'Unknown holder'
+  return n || 'Usuário desconhecido'
 }
 
 function keyEventHeadline(row: {
@@ -66,46 +65,46 @@ function keyEventHeadline(row: {
   newHolderName: string | null
   note: string | null
 }): { headline: string; detail: string | null } {
-  const actor = row.actorName?.trim() || 'Unknown user'
+  const actor = row.actorName?.trim() || 'Usuário desconhecido'
   const prev = holderLabel(row.previousHolderId, row.previousHolderName)
   const next = holderLabel(row.newHolderId, row.newHolderName)
 
   switch (row.source) {
     case 'request_created':
       return {
-        headline: `${actor} requested the key from the assistant.`,
-        detail: row.note ? `Note: ${row.note}` : null,
+        headline: `${actor} requisitou a chave à secretaria.`,
+        detail: row.note ? `Nota: ${row.note}` : null,
       }
     case 'request_approved':
       return {
-        headline: `${actor} approved the request — key went from ${prev} to ${next}.`,
+        headline: `${actor} aprovou a requisição — a chave foi de ${prev} para ${next}.`,
         detail: null,
       }
     case 'assistant_return':
       return {
-        headline: `${actor} took custody of the key (from ${prev}).`,
+        headline: `${actor} assumiu a posse da chave (era de ${prev}).`,
         detail: row.note ?? null,
       }
     case 'admin_action':
       if (row.newHolderId == null && row.previousHolderId != null) {
         return {
-          headline: `${actor} moved the key to the vault.`,
+          headline: `${actor} moveu a chave para a secretaria.`,
           detail: row.note ?? null,
         }
       }
       return {
-        headline: `${actor} updated key custody (${prev} → ${next}).`,
+        headline: `${actor} atualizou a posse da chave (${prev} → ${next}).`,
         detail: row.note ?? null,
       }
     case 'initial':
       return {
-        headline: 'Initial key custody recorded.',
+        headline: 'Posse inicial da chave registrada.',
         detail: row.note ?? null,
       }
     case 'member_trade':
     default:
       return {
-        headline: `Key custody changed from ${prev} to ${next}.`,
+        headline: `A custódia da chave mudou de ${prev} para ${next}.`,
         detail: row.note ?? null,
       }
   }
@@ -117,9 +116,9 @@ function roomEventHeadline(row: {
   source: string
   note: string | null
 }): { headline: string; detail: string | null } {
-  const actor = row.actorName?.trim() || 'Unknown user'
-  const action = row.isOpen ? 'opened the room' : 'closed the room'
-  const via = row.source === 'admin_override' ? ' (admin override)' : ''
+  const actor = row.actorName?.trim() || 'Usuário desconhecido'
+  const action = row.isOpen ? 'abriu a sala' : 'fechou a sala'
+  const via = row.source === 'admin_override' ? ' ação de admin' : ''
   return {
     headline: `${actor} ${action}${via}.`,
     detail: row.note ?? null,
@@ -231,7 +230,7 @@ export async function getActivityHistory(
     return {
       id: r.id,
       at: r.createdAt,
-      actorName: r.actorName?.trim() || 'Unknown user',
+      actorName: r.actorName?.trim() || 'Usuário desconhecido',
       headline,
       detail,
       sourceLabel: labelKeySource(r.source),
@@ -243,7 +242,7 @@ export async function getActivityHistory(
     return {
       id: r.id,
       at: r.createdAt,
-      actorName: r.actorName?.trim() || 'Unknown user',
+      actorName: r.actorName?.trim() || 'Usuário desconhecido',
       headline,
       detail,
       sourceLabel: labelRoomSource(r.source),
