@@ -127,14 +127,12 @@ export function MembersAdminClient({
       <Card className='border-border/50 shadow-lg'>
         <CardHeader className='space-y-4 sm:flex sm:flex-row sm:items-start sm:justify-between sm:space-y-0'>
           <div className='space-y-1'>
-            <CardTitle>Members</CardTitle>
+            <CardTitle>Membros</CardTitle>
             <CardDescription>
-              {activeMembers.length} active
+              {activeMembers.length} ativos
               {disabledMembers.length > 0
-                ? ` · ${disabledMembers.length} disabled`
+                ? ` · ${disabledMembers.length} inativos`
                 : ''}
-              . Disabled accounts cannot sign in; data is kept. Only one active
-              assistant is allowed.
             </CardDescription>
           </div>
           <Button
@@ -143,7 +141,7 @@ export function MembersAdminClient({
             onClick={() => setCreateOpen(true)}
           >
             <PlusIcon className='size-4' />
-            Add member
+            Adicionar membro
           </Button>
         </CardHeader>
         <Separator />
@@ -151,10 +149,10 @@ export function MembersAdminClient({
           <Tabs defaultValue='active' className='w-full gap-4'>
             <TabsList className='h-auto w-full justify-start sm:w-auto'>
               <TabsTrigger value='active' className='text-xs sm:text-sm'>
-                Active ({activeMembers.length})
+                Ativos ({activeMembers.length})
               </TabsTrigger>
               <TabsTrigger value='disabled' className='text-xs sm:text-sm'>
-                Disabled ({disabledMembers.length})
+                Inativos ({disabledMembers.length})
               </TabsTrigger>
             </TabsList>
 
@@ -162,12 +160,12 @@ export function MembersAdminClient({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Enrollment</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead className='text-right'>Actions</TableHead>
+                    <TableHead>Cadastro</TableHead>
+                    <TableHead>Cargo</TableHead>
+                    <TableHead>Chave</TableHead>
+                    <TableHead className='text-right'>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -177,7 +175,7 @@ export function MembersAdminClient({
                         colSpan={6}
                         className='text-muted-foreground py-8 text-center text-sm'
                       >
-                        No active members.
+                        Sem membros ativos
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -199,7 +197,7 @@ export function MembersAdminClient({
                         <TableCell>
                           {m.holdsKey ? (
                             <Badge variant='default' className='font-normal'>
-                              Holds key
+                              Tem posse
                             </Badge>
                           ) : (
                             <span className='text-muted-foreground'>—</span>
@@ -213,7 +211,7 @@ export function MembersAdminClient({
                               size='sm'
                               onClick={() => setEditing(m)}
                             >
-                              Edit
+                              Editar
                             </Button>
                             <Button
                               type='button'
@@ -229,7 +227,7 @@ export function MembersAdminClient({
                               }
                               onClick={() => setDisableTarget(m)}
                             >
-                              Disable
+                              Desabilitar
                             </Button>
                           </div>
                         </TableCell>
@@ -246,10 +244,10 @@ export function MembersAdminClient({
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Enrollment</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead className='text-right'>Actions</TableHead>
+                    <TableHead>Cadastro</TableHead>
+                    <TableHead>Cargo</TableHead>
+                    <TableHead>Chave</TableHead>
+                    <TableHead className='text-right'>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -259,7 +257,7 @@ export function MembersAdminClient({
                         colSpan={6}
                         className='text-muted-foreground py-8 text-center text-sm'
                       >
-                        No disabled members.
+                        Sem membros inativos
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -281,7 +279,7 @@ export function MembersAdminClient({
                         <TableCell>
                           {m.holdsKey ? (
                             <Badge variant='outline' className='font-normal'>
-                              Holds key
+                              Tem posse
                             </Badge>
                           ) : (
                             <span className='text-muted-foreground'>—</span>
@@ -304,7 +302,7 @@ export function MembersAdminClient({
                                 } else toast.error(r.error)
                               }}
                             >
-                              Enable
+                              Habilitar
                             </Button>
                             <Button
                               type='button'
@@ -312,7 +310,7 @@ export function MembersAdminClient({
                               size='sm'
                               onClick={() => setEditing(m)}
                             >
-                              Edit
+                              Editar
                             </Button>
                           </div>
                         </TableCell>
@@ -335,7 +333,7 @@ export function MembersAdminClient({
       >
         <DialogContent className='gap-0 p-0 sm:max-w-md'>
           <DialogHeader className='p-4 pb-2'>
-            <DialogTitle>Add member</DialogTitle>
+            <DialogTitle>Adicionar membro</DialogTitle>
             <DialogDescription>
               New accounts receive the password you set here. They can change it
               after first login.
