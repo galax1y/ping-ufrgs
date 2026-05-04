@@ -33,7 +33,7 @@ export function AdminResetKeyCard() {
       </div>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
-          <Button className='w-full' variant='outline' type='button'>
+          <Button className='w-full bg-primary' variant='default' type='button'>
             Restaurar
           </Button>
         </AlertDialogTrigger>

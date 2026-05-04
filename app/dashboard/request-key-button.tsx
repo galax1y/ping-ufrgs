@@ -16,7 +16,7 @@ export function RequestKeyButton({
   const router = useRouter()
 
   const enabled = canRequest && !pending
-  const label = pending ? 'Request pending' : 'Request key'
+  const label = pending ? 'Requisição pendente' : 'Requisitar chave'
 
   return (
     <Button
@@ -27,14 +27,14 @@ export function RequestKeyButton({
       onClick={
         enabled
           ? async () => {
-              const r = await requestKeyAction('')
-              if (r.ok) {
-                toast.success('Request sent.')
-                router.refresh()
-              } else {
-                toast.error(r.error)
-              }
+            const r = await requestKeyAction('')
+            if (r.ok) {
+              toast.success('Request sent.')
+              router.refresh()
+            } else {
+              toast.error(r.error)
             }
+          }
           : undefined
       }
     >

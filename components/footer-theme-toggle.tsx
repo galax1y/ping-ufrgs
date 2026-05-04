@@ -25,7 +25,7 @@ export function FooterThemeToggle() {
     return (
       <div className={baseClass} aria-hidden>
         <span className='size-5' />
-        <p>{isDark ? 'light' : 'dark'}</p>
+        Theme
       </div>
     )
   }

@@ -18,7 +18,7 @@ export function RequestKeyFromHolderButton({
   const router = useRouter()
 
   const enabled = canRequest && !pending
-  const label = pending ? 'Request pending' : `Request key from ${holderName}`
+  const label = pending ? 'Requisição pendente' : `Requisitar chave de ${holderName}`
 
   return (
     <Button

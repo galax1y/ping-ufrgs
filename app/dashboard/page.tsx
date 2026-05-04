@@ -5,7 +5,6 @@ import { getDashboardState } from '@/actions/member/get-dashboard-state'
 import { type SemanticStatusTone, semanticStatus } from '@/lib/semantic-status'
 import { cn } from '@/lib/utils'
 
-import { AdminResetKeyCard } from './admin-reset-key-card'
 import { AssistantForceRetrieveCard } from './assistant-force-retrieve-card'
 import { HolderIncomingRequests } from './holder-incoming-requests'
 import { RequestKeyButton } from './request-key-button'
@@ -150,8 +149,6 @@ export default async function DashboardPage() {
             </p>
           </div>
         </section>
-
-        {self.role === 'admin' ? <AdminResetKeyCard /> : null}
 
         {self.role === 'assistant' && assistantCanForceRetrieve ? (
           <AssistantForceRetrieveCard

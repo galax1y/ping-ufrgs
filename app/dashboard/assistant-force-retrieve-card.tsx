@@ -53,7 +53,7 @@ export function AssistantForceRetrieveCard({
       </div>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
-          <Button className='w-full' variant='secondary' type='button'>
+          <Button className='w-full bg-primary' variant='ghost' type='button' >
             Chave devolvida
           </Button>
         </AlertDialogTrigger>
