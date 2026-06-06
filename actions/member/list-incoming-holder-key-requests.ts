@@ -6,6 +6,7 @@ import database from '@/database'
 import { keyRequestsInPing, membersInPing } from '@/database/drizzle/schema'
 import type { IncomingHolderKeyRequestRow } from '@/actions/member/get-dashboard-state'
 import { requireAuth } from '@/lib/auth/guards'
+import { memberPhotoVersion } from '@/lib/profile-picture-data-url'
 
 export type { IncomingHolderKeyRequestRow }
 
@@ -19,8 +20,11 @@ export async function listIncomingHolderKeyRequestsAction(): Promise<
       id: keyRequestsInPing.id,
       createdAt: keyRequestsInPing.createdAt,
       reason: keyRequestsInPing.reason,
+      requesterId: keyRequestsInPing.requesterId,
       requesterName: membersInPing.name,
       requesterEmail: membersInPing.email,
+      profilePicture: membersInPing.profilePicture,
+      updatedAt: membersInPing.updatedAt,
     })
     .from(keyRequestsInPing)
     .innerJoin(
@@ -39,8 +43,13 @@ export async function listIncomingHolderKeyRequestsAction(): Promise<
   return rows.map((r) => ({
     id: r.id,
     createdAt: r.createdAt.toISOString(),
+    requesterId: r.requesterId,
     requesterName: r.requesterName,
     requesterEmail: r.requesterEmail,
+    requesterPhotoVersion: memberPhotoVersion(
+      r.updatedAt,
+      r.profilePicture != null,
+    ),
     reason: r.reason,
   }))
 }

@@ -29,6 +29,13 @@
       "when": 1777748326592,
       "tag": "0003_member_disabled",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777748326593,
+      "tag": "0004_member_profile_picture",
+      "breakpoints": true
     }
   ]
 }

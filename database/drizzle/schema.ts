@@ -59,6 +59,8 @@ export const membersInPing = ping.table(
       .notNull(),
     /** When true, the account cannot sign in and is listed only under Disabled. */
     disabled: boolean('disabled').notNull().default(false),
+    /** Data URL (base64) for profile photo shown on key requests. Max ~2 MB source file. */
+    profilePicture: text('profile_picture'),
   },
   (table) => [
     uniqueIndex('members_email_unique').on(table.email),

@@ -11,12 +11,15 @@ import {
 } from '@/database/drizzle/schema'
 import { requireAuth } from '@/lib/auth/guards'
 import { isSameMember } from '@/lib/member-ids'
+import { memberPhotoVersion } from '@/lib/profile-picture-data-url'
 
 export type IncomingHolderKeyRequestRow = {
   id: string
   createdAt: string
+  requesterId: string
   requesterName: string
   requesterEmail: string
+  requesterPhotoVersion: number | null
   reason: string | null
 }
 
@@ -26,6 +29,7 @@ export type DashboardState = {
     name: string
     email: string
     role: 'admin' | 'member' | 'assistant'
+    photoVersion: number | null
   }
   /** You are the current key holder (DB holder_id). */
   selfHoldsKey: boolean
@@ -64,6 +68,15 @@ export type DashboardState = {
 
 export async function getDashboardState(): Promise<DashboardState> {
   const member = await requireAuth()
+
+  const [selfRow] = await database
+    .select({
+      profilePicture: membersInPing.profilePicture,
+      updatedAt: membersInPing.updatedAt,
+    })
+    .from(membersInPing)
+    .where(eq(membersInPing.id, member.id))
+    .limit(1)
 
   const [roomRow] = await database
     .select()
@@ -143,8 +156,11 @@ export async function getDashboardState(): Promise<DashboardState> {
         id: keyRequestsInPing.id,
         createdAt: keyRequestsInPing.createdAt,
         reason: keyRequestsInPing.reason,
+        requesterId: keyRequestsInPing.requesterId,
         requesterName: membersInPing.name,
         requesterEmail: membersInPing.email,
+        profilePicture: membersInPing.profilePicture,
+        updatedAt: membersInPing.updatedAt,
       })
       .from(keyRequestsInPing)
       .innerJoin(
@@ -163,8 +179,13 @@ export async function getDashboardState(): Promise<DashboardState> {
     incomingHolderRequests = incomingRows.map((r) => ({
       id: r.id,
       createdAt: r.createdAt.toISOString(),
+      requesterId: r.requesterId,
       requesterName: r.requesterName,
       requesterEmail: r.requesterEmail,
+      requesterPhotoVersion: memberPhotoVersion(
+        r.updatedAt,
+        r.profilePicture != null,
+      ),
       reason: r.reason,
     }))
   }
@@ -180,6 +201,10 @@ export async function getDashboardState(): Promise<DashboardState> {
       name: member.name,
       email: member.email,
       role: member.role,
+      photoVersion: memberPhotoVersion(
+        selfRow?.updatedAt ?? new Date(0),
+        selfRow?.profilePicture != null,
+      ),
     },
     selfHoldsKey,
     room: roomRow

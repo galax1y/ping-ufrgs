@@ -6,12 +6,16 @@ import database from '@/database'
 import { keyRequestsInPing, membersInPing } from '@/database/drizzle/schema'
 import { requireAssistant } from '@/lib/auth/guards'
 
+import { memberPhotoVersion } from '@/lib/profile-picture-data-url'
+
 export type PendingKeyRequestRow = {
   id: string
   /** ISO string (serializable to client components). */
   createdAt: string
+  requesterId: string
   requesterName: string
   requesterEmail: string
+  requesterPhotoVersion: number | null
   reason: string | null
 }
 
@@ -25,8 +29,11 @@ export async function listPendingKeyRequestsAction(): Promise<
       id: keyRequestsInPing.id,
       createdAt: keyRequestsInPing.createdAt,
       reason: keyRequestsInPing.reason,
+      requesterId: keyRequestsInPing.requesterId,
       requesterName: membersInPing.name,
       requesterEmail: membersInPing.email,
+      profilePicture: membersInPing.profilePicture,
+      updatedAt: membersInPing.updatedAt,
     })
     .from(keyRequestsInPing)
     .innerJoin(
@@ -42,7 +49,15 @@ export async function listPendingKeyRequestsAction(): Promise<
     .orderBy(asc(keyRequestsInPing.createdAt))
 
   return rows.map((r) => ({
-    ...r,
+    id: r.id,
     createdAt: r.createdAt.toISOString(),
+    requesterId: r.requesterId,
+    requesterName: r.requesterName,
+    requesterEmail: r.requesterEmail,
+    requesterPhotoVersion: memberPhotoVersion(
+      r.updatedAt,
+      r.profilePicture != null,
+    ),
+    reason: r.reason,
   }))
 }

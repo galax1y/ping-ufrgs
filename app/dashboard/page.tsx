@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 
 import { AssistantForceRetrieveCard } from './assistant-force-retrieve-card'
 import { HolderIncomingRequests } from './holder-incoming-requests'
+import { MyProfilePictureCard } from './my-profile-picture-card'
 import { RequestKeyButton } from './request-key-button'
 import { RequestKeyFromHolderButton } from './request-key-from-holder-button'
 import { RoomToggleButton } from './room-toggle-button'
@@ -190,6 +191,12 @@ export default async function DashboardPage() {
             />
           </div>
         ) : null}
+
+        <MyProfilePictureCard
+          memberId={self.id}
+          name={self.name}
+          photoVersion={self.photoVersion}
+        />
       </div>
     </div>
   )

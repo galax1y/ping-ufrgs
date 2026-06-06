@@ -12,6 +12,10 @@ import {
 } from '@/actions/admin/members/assistant-slot'
 import { hashPassword } from '@/lib/auth/password'
 import { requireAdmin } from '@/lib/auth/guards'
+import {
+  applyProfilePictureUpdate,
+} from '@/lib/profile-picture'
+import { resolveProfilePictureUpdate } from '@/lib/profile-picture-server'
 
 const ROLES = ['admin', 'member', 'assistant'] as const
 
@@ -49,6 +53,7 @@ export async function updateMemberAction(
     enrollmentNumber: string
     role: typeof role
     passwordHash?: string
+    profilePicture?: string | null
     updatedAt: Date
   } = {
     name,
@@ -65,6 +70,12 @@ export async function updateMemberAction(
   if (role === 'assistant' && (await hasOtherActiveAssistant(id))) {
     return { ok: false, error: ASSISTANT_CONFLICT_MESSAGE }
   }
+
+  const pictureResolved = await resolveProfilePictureUpdate(formData)
+  if (!pictureResolved.ok) {
+    return { ok: false, error: pictureResolved.error }
+  }
+  Object.assign(updates, applyProfilePictureUpdate(pictureResolved.update))
 
   try {
     await database

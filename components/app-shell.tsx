@@ -35,10 +35,11 @@ export async function AppShell({
 
   return (
     <>
-      <main className='bg-background text-foreground flex h-dvh min-h-0 flex-col overflow-hidden pb-28'>
+      <main className='bg-background text-foreground flex min-h-dvh flex-col overflow-y-auto pb-[calc(6.5rem+env(safe-area-inset-bottom))]'>
         {children}
       </main>
       <AppBottomNav
+        memberName={member.name}
         isAdmin={member.role === 'admin'}
         isAssistant={member.role === 'assistant'}
         pendingKeyRequestCount={pendingKeyRequestCount}

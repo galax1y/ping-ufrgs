@@ -6,7 +6,9 @@ import { toast } from 'sonner'
 
 import { acceptKeyRequestAction } from '@/actions/assistant/accept-key-request'
 import type { PendingKeyRequestRow } from '@/actions/assistant/list-pending-key-requests'
+import { MemberAvatar } from '@/components/member-avatar'
 import { Button } from '@/components/ui/button'
+import { keyRequestIntro } from '@/lib/key-request-copy'
 
 export function AssistantPendingRequests({
   initialRequests,
@@ -27,7 +29,7 @@ export function AssistantPendingRequests({
   return (
     <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
       <p className='text-muted-foreground text-xs text-pretty'>
-        Membros fazem requisições pela posse da chave. Aceitar transfere a posse da chave para ele, enquanto as outras requisições pendentes são canceladas.
+        {keyRequestIntro(initialRequests.length)}
       </p>
       <ul className='space-y-3'>
         {initialRequests.map((r) => (
@@ -35,8 +37,15 @@ export function AssistantPendingRequests({
             key={r.id}
             className='border-border/60 flex flex-col gap-2 rounded-xl border bg-background/40 p-3 sm:flex-row sm:items-center sm:justify-between'
           >
-            <div className='min-w-0'>
-              <p className='truncate text-sm font-medium'>{r.requesterName}</p>
+            <div className='flex min-w-0 flex-1 gap-3'>
+              <MemberAvatar
+                name={r.requesterName}
+                memberId={r.requesterId}
+                photoVersion={r.requesterPhotoVersion}
+                size='lg'
+              />
+              <div className='min-w-0'>
+                <p className='truncate text-sm font-medium'>{r.requesterName}</p>
               <p className='text-muted-foreground truncate text-xs'>
                 {r.requesterEmail}
               </p>
@@ -51,6 +60,7 @@ export function AssistantPendingRequests({
                   “{r.reason}”
                 </p>
               ) : null}
+              </div>
             </div>
             <Button
               className='shrink-0 sm:ml-2'

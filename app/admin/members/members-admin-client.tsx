@@ -1,11 +1,12 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { createMemberAction } from '@/actions/admin/members/create-member'
+import { getMemberForAdminEditAction } from '@/actions/admin/members/get-member-for-edit'
 import { type AdminMemberRow } from '@/actions/admin/members/list-members'
 import { setMemberDisabledAction } from '@/actions/admin/members/set-member-disabled'
 import { updateMemberAction } from '@/actions/admin/members/update-member'
@@ -50,6 +51,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { ProfilePictureField } from '@/components/profile-picture-field'
 import {
   Table,
   TableBody,
@@ -114,6 +116,9 @@ export function MembersAdminClient({
   const [createOpen, setCreateOpen] = useState(false)
   const [createFormKey, setCreateFormKey] = useState(0)
   const [editing, setEditing] = useState<AdminMemberRow | null>(null)
+  const [editingProfilePicture, setEditingProfilePicture] = useState<
+    string | null
+  >(null)
   const [disableTarget, setDisableTarget] = useState<AdminMemberRow | null>(null)
   const [disablePending, setDisablePending] = useState(false)
 
@@ -125,6 +130,22 @@ export function MembersAdminClient({
     () => members.filter((m) => m.disabled),
     [members],
   )
+
+  useEffect(() => {
+    if (!editing) {
+      setEditingProfilePicture(null)
+      return
+    }
+    let cancelled = false
+    getMemberForAdminEditAction(editing.id).then((row) => {
+      if (!cancelled) {
+        setEditingProfilePicture(row?.profilePicture ?? null)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [editing])
 
   return (
     <div className='space-y-6'>
@@ -390,6 +411,7 @@ export function MembersAdminClient({
                   />
                 </FieldContent>
               </Field>
+              <ProfilePictureField memberName='Novo membro' />
             </FieldGroup>
             <DialogFooter className='mt-4 border-t bg-muted/40 px-0 pt-4 sm:justify-end'>
               <Button
@@ -492,6 +514,11 @@ export function MembersAdminClient({
                     />
                   </FieldContent>
                 </Field>
+                <ProfilePictureField
+                  memberName={editing.name}
+                  currentPicture={editingProfilePicture}
+                  showClear
+                />
               </FieldGroup>
               <DialogFooter className='mt-4 border-t bg-muted/40 px-0 pt-4 sm:justify-end'>
                 <Button

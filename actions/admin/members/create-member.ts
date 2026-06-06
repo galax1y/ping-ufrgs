@@ -11,6 +11,10 @@ import {
 } from '@/actions/admin/members/assistant-slot'
 import { hashPassword } from '@/lib/auth/password'
 import { requireAdmin } from '@/lib/auth/guards'
+import {
+  applyProfilePictureUpdate,
+} from '@/lib/profile-picture'
+import { resolveProfilePictureUpdate } from '@/lib/profile-picture-server'
 
 const ROLES = ['admin', 'member', 'assistant'] as const
 
@@ -46,6 +50,11 @@ export async function createMemberAction(
     return { ok: false, error: ASSISTANT_CONFLICT_MESSAGE }
   }
 
+  const pictureResolved = await resolveProfilePictureUpdate(formData)
+  if (!pictureResolved.ok) {
+    return { ok: false, error: pictureResolved.error }
+  }
+
   try {
     await database.insert(membersInPing).values({
       name,
@@ -54,6 +63,7 @@ export async function createMemberAction(
       passwordHash: hash,
       role,
       disabled: false,
+      ...applyProfilePictureUpdate(pictureResolved.update),
     })
   } catch (e: unknown) {
     if (isUniqueViolation(e)) {

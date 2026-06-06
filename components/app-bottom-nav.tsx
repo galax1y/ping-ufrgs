@@ -60,10 +60,12 @@ function NavItem({
 }
 
 export function AppBottomNav({
+  memberName,
   isAdmin,
   isAssistant,
   pendingKeyRequestCount = 0,
 }: {
+  memberName: string
   isAdmin: boolean
   isAssistant: boolean
   /** Pending key requests (assistants only; shown on Requests tab). */
@@ -82,6 +84,14 @@ export function AppBottomNav({
       className='border-border/60 bg-background/90 supports-backdrop-filter:bg-background/80 fixed inset-x-0 bottom-0 z-50 border-t shadow-[0_-4px_24px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:shadow-[0_-4px_24px_rgba(0,0,0,0.35)]'
       style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
     >
+      <p
+        className='text-muted-foreground border-border/60 truncate px-4 py-1.5 text-center text-[11px] font-medium'
+        title={`KeyPET | ${memberName}`}
+      >
+        <span className='text-foreground font-semibold'>KeyPET</span>
+        <span className='text-muted-foreground/70'> | </span>
+        {memberName}
+      </p>
       <div
         className={cn(
           'mx-auto grid h-[4.25rem] max-w-lg gap-1 px-2 pt-1',
