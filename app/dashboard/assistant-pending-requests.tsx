@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 import { acceptKeyRequestAction } from '@/actions/assistant/accept-key-request'
 import type { PendingKeyRequestRow } from '@/actions/assistant/list-pending-key-requests'
-import { MemberAvatar } from '@/components/member-avatar'
+import { KeyRequestRequesterPhoto } from '@/components/key-request-requester-photo'
 import { Button } from '@/components/ui/button'
 import { keyRequestIntro } from '@/lib/key-request-copy'
 
@@ -38,11 +38,10 @@ export function AssistantPendingRequests({
             className='border-border/60 flex flex-col gap-2 rounded-xl border bg-background/40 p-3 sm:flex-row sm:items-center sm:justify-between'
           >
             <div className='flex min-w-0 flex-1 gap-3'>
-              <MemberAvatar
-                name={r.requesterName}
-                memberId={r.requesterId}
+              <KeyRequestRequesterPhoto
+                requesterId={r.requesterId}
+                requesterName={r.requesterName}
                 photoVersion={r.requesterPhotoVersion}
-                size='lg'
               />
               <div className='min-w-0'>
                 <p className='truncate text-sm font-medium'>{r.requesterName}</p>
