@@ -31,7 +31,7 @@ export function AssistantForceRetrieveCard({
 
   const translatedRole =
     currentHolderRole === 'admin'
-      ? 'Admin'
+      ? 'Administrador'
       : currentHolderRole === 'member'
         ? 'Membro'
         : currentHolderRole === 'assistant'

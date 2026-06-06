@@ -4,7 +4,7 @@ import database from '@/database'
 import { membersInPing } from '@/database/drizzle/schema'
 
 const ASSISTANT_CONFLICT_MESSAGE =
-  'There is already an active assistant. Change that member’s role, or disable their account, before assigning another assistant.'
+  'Já existe uma secretaria ativa. Altere o cargo desse membro ou desabilite a conta antes de designar outra secretaria.'
 
 export { ASSISTANT_CONFLICT_MESSAGE }
 

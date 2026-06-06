@@ -62,7 +62,7 @@ export function LoginForm() {
               </FieldContent>
             </Field>
             <Field>
-              <FieldLabel htmlFor='password'>Password</FieldLabel>
+              <FieldLabel htmlFor='password'>Senha</FieldLabel>
               <FieldContent>
                 <Input
                   id='password'
@@ -74,14 +74,14 @@ export function LoginForm() {
               </FieldContent>
             </Field>
             <Button type='submit' className='w-full' size='lg' disabled={pending}>
-              {pending ? 'Signing in…' : 'Sign in'}
+              {pending ? 'Entrando…' : 'Entrar'}
             </Button>
           </FieldGroup>
         </form>
       </CardContent>
       <CardFooter className='flex justify-center border-t border-border/50 pt-6'>
         <FieldDescription className='text-center text-pretty'>
-          Ainda sem acesso? Entre em contato com um admin para criar sua conta!
+          Ainda sem acesso? Entre em contato com um administrador para criar sua conta!
         </FieldDescription>
       </CardFooter>
     </Card>

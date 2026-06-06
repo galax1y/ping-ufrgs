@@ -17,7 +17,7 @@ import { HistoryPagination, historyPath } from './history-pagination'
 export const dynamic = 'force-dynamic'
 
 function formatWhen(d: Date) {
-  return d.toLocaleString(undefined, {
+  return d.toLocaleString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit',
@@ -180,7 +180,7 @@ export default async function HistoryPage({
           <div className='min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain'>
             <HistoryEventList
               items={keyHistory}
-              emptyLabel='No key events yet.'
+              emptyLabel='Nenhum evento de chave ainda.'
               highlightKeyLogId={latestConcreteKeyMovementId}
             />
           </div>
@@ -201,7 +201,7 @@ export default async function HistoryPage({
           <div className='min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain'>
             <HistoryEventList
               items={roomHistory}
-              emptyLabel='No room events yet.'
+              emptyLabel='Nenhum evento de sala ainda.'
             />
           </div>
           <HistoryPagination

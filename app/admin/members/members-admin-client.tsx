@@ -61,10 +61,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const roles = [
-  { value: 'member', label: 'Member' },
-  { value: 'assistant', label: 'Assistant' },
-  { value: 'admin', label: 'Admin' },
+  { value: 'member', label: 'Membro' },
+  { value: 'assistant', label: 'Secretaria' },
+  { value: 'admin', label: 'Administrador' },
 ] as const
+
+function roleLabel(role: AdminMemberRow['role']) {
+  return roles.find((r) => r.value === role)?.label ?? role
+}
 
 function roleBadgeVariant(role: AdminMemberRow['role']) {
   if (role === 'admin') return 'default' as const
@@ -85,7 +89,7 @@ function RoleSelectField({
       <input type='hidden' name={name} value={value} readOnly />
       <Select value={value} onValueChange={setValue}>
         <SelectTrigger className='w-full'>
-          <SelectValue placeholder='Role' />
+          <SelectValue placeholder='Cargo' />
         </SelectTrigger>
         <SelectContent>
           {roles.map((r) => (
@@ -189,9 +193,8 @@ export function MembersAdminClient({
                         <TableCell>
                           <Badge
                             variant={roleBadgeVariant(m.role)}
-                            className='capitalize'
                           >
-                            {m.role}
+                            {roleLabel(m.role)}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -222,7 +225,7 @@ export function MembersAdminClient({
                               }
                               title={
                                 m.holdsKey
-                                  ? 'Transfer or reset key custody first'
+                                  ? 'Transfira ou restaure a posse da chave antes de desabilitar'
                                   : undefined
                               }
                               onClick={() => setDisableTarget(m)}
@@ -242,7 +245,7 @@ export function MembersAdminClient({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Cadastro</TableHead>
                     <TableHead>Cargo</TableHead>
@@ -271,9 +274,8 @@ export function MembersAdminClient({
                         <TableCell>
                           <Badge
                             variant={roleBadgeVariant(m.role)}
-                            className='capitalize'
                           >
-                            {m.role}
+                            {roleLabel(m.role)}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -297,7 +299,7 @@ export function MembersAdminClient({
                                   false,
                                 )
                                 if (r.ok) {
-                                  toast.success('Account re-enabled')
+                                  toast.success('Conta reativada')
                                   router.refresh()
                                 } else toast.error(r.error)
                               }}
@@ -335,8 +337,8 @@ export function MembersAdminClient({
           <DialogHeader className='p-4 pb-2'>
             <DialogTitle>Adicionar membro</DialogTitle>
             <DialogDescription>
-              New accounts receive the password you set here. They can change it
-              after first login.
+              A senha definida aqui será usada no primeiro acesso. O membro pode
+              alterá-la depois de entrar.
             </DialogDescription>
           </DialogHeader>
           <form
@@ -345,7 +347,7 @@ export function MembersAdminClient({
             action={async (fd) => {
               const r = await createMemberAction(fd)
               if (r.ok) {
-                toast.success('Member created')
+                toast.success('Membro criado')
                 setCreateOpen(false)
                 router.refresh()
               } else toast.error(r.error)
@@ -353,7 +355,7 @@ export function MembersAdminClient({
           >
             <FieldGroup className='gap-4'>
               <Field>
-                <FieldLabel>Name</FieldLabel>
+                <FieldLabel>Nome</FieldLabel>
                 <FieldContent>
                   <Input name='name' required autoComplete='off' />
                 </FieldContent>
@@ -365,19 +367,19 @@ export function MembersAdminClient({
                 </FieldContent>
               </Field>
               <Field>
-                <FieldLabel>Enrollment</FieldLabel>
+                <FieldLabel>Matrícula</FieldLabel>
                 <FieldContent>
                   <Input name='enrollmentNumber' required autoComplete='off' />
                 </FieldContent>
               </Field>
               <Field>
-                <FieldLabel>Role</FieldLabel>
+                <FieldLabel>Cargo</FieldLabel>
                 <FieldContent>
                   <RoleSelectField name='role' defaultValue='member' />
                 </FieldContent>
               </Field>
               <Field>
-                <FieldLabel>Password</FieldLabel>
+                <FieldLabel>Senha</FieldLabel>
                 <FieldContent>
                   <Input
                     name='password'
@@ -395,9 +397,9 @@ export function MembersAdminClient({
                 variant='outline'
                 onClick={() => setCreateOpen(false)}
               >
-                Cancel
+                Cancelar
               </Button>
-              <Button type='submit'>Create</Button>
+              <Button type='submit'>Criar</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -411,15 +413,15 @@ export function MembersAdminClient({
       >
         <DialogContent className='gap-0 p-0 sm:max-w-md'>
           <DialogHeader className='p-4 pb-2'>
-            <DialogTitle>Edit member</DialogTitle>
+            <DialogTitle>Editar membro</DialogTitle>
             <DialogDescription>
-              Update profile, role, or set a new password. Leave password blank
-              to keep the current one.
+              Atualize perfil, cargo ou defina uma nova senha. Deixe a senha em
+              branco para manter a atual.
               {editing?.disabled ? (
                 <>
                   {' '}
-                  This account is <strong>disabled</strong> — use Enable on the
-                  Disabled tab to allow sign-in.
+                  Esta conta está <strong>desabilitada</strong> — use Habilitar na
+                  aba Inativos para permitir o acesso novamente.
                 </>
               ) : null}
             </DialogDescription>
@@ -431,7 +433,7 @@ export function MembersAdminClient({
               action={async (fd) => {
                 const r = await updateMemberAction(fd)
                 if (r.ok) {
-                  toast.success('Member updated')
+                  toast.success('Membro atualizado')
                   setEditing(null)
                   router.refresh()
                 } else toast.error(r.error)
@@ -440,7 +442,7 @@ export function MembersAdminClient({
               <input type='hidden' name='id' value={editing.id} />
               <FieldGroup className='gap-4'>
                 <Field>
-                  <FieldLabel>Name</FieldLabel>
+                  <FieldLabel>Nome</FieldLabel>
                   <FieldContent>
                     <Input
                       name='name'
@@ -462,7 +464,7 @@ export function MembersAdminClient({
                   </FieldContent>
                 </Field>
                 <Field>
-                  <FieldLabel>Enrollment</FieldLabel>
+                  <FieldLabel>Matrícula</FieldLabel>
                   <FieldContent>
                     <Input
                       name='enrollmentNumber'
@@ -473,19 +475,19 @@ export function MembersAdminClient({
                   </FieldContent>
                 </Field>
                 <Field>
-                  <FieldLabel>Role</FieldLabel>
+                  <FieldLabel>Cargo</FieldLabel>
                   <FieldContent>
                     <RoleSelectField name='role' defaultValue={editing.role} />
                   </FieldContent>
                 </Field>
                 <Field>
-                  <FieldLabel>New password (optional)</FieldLabel>
+                  <FieldLabel>Nova senha (opcional)</FieldLabel>
                   <FieldContent>
                     <Input
                       name='password'
                       type='password'
                       minLength={8}
-                      placeholder='Leave blank to keep current'
+                      placeholder='Deixe em branco para manter a atual'
                       autoComplete='new-password'
                     />
                   </FieldContent>
@@ -497,9 +499,9 @@ export function MembersAdminClient({
                   variant='outline'
                   onClick={() => setEditing(null)}
                 >
-                  Cancel
+                  Cancelar
                 </Button>
-                <Button type='submit'>Save</Button>
+                <Button type='submit'>Salvar</Button>
               </DialogFooter>
             </form>
           ) : null}
@@ -514,15 +516,15 @@ export function MembersAdminClient({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Disable this account?</AlertDialogTitle>
+            <AlertDialogTitle>Desabilitar esta conta?</AlertDialogTitle>
             <AlertDialogDescription>
               {disableTarget
-                ? `${disableTarget.name} will not be able to sign in. Their data stays in the system; you can re-enable them from the Disabled tab.`
+                ? `${disableTarget.name} não poderá mais entrar. Os dados permanecem no sistema; você pode reativar a conta na aba Inativos.`
                 : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={disablePending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={disablePending}>Cancelar</AlertDialogCancel>
             <Button
               variant='secondary'
               disabled={disablePending}
@@ -532,7 +534,7 @@ export function MembersAdminClient({
                 try {
                   const r = await setMemberDisabledAction(disableTarget.id, true)
                   if (r.ok) {
-                    toast.success('Account disabled')
+                    toast.success('Conta desabilitada')
                     setDisableTarget(null)
                     router.refresh()
                   } else toast.error(r.error)
@@ -541,7 +543,7 @@ export function MembersAdminClient({
                 }
               }}
             >
-              Disable account
+              Desabilitar conta
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

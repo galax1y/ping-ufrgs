@@ -22,7 +22,7 @@ export async function acceptKeyRequestAction(
   const assistant = await requireAssistant()
 
   if (!requestId) {
-    return { ok: false, error: 'Invalid request.' }
+    return { ok: false, error: 'Requisição inválida.' }
   }
 
   try {
@@ -102,7 +102,7 @@ export async function acceptKeyRequestAction(
           status: 'cancelled',
           decidedById: assistant.id,
           decidedAt,
-          decisionNote: 'Cancelled: key issued to another member',
+          decisionNote: 'Cancelada: chave entregue a outro membro',
         })
         .where(
           and(
@@ -114,27 +114,27 @@ export async function acceptKeyRequestAction(
   } catch (e) {
     const msg = e instanceof Error ? e.message : ''
     if (msg === 'NOT_FOUND') {
-      return { ok: false, error: 'Request not found.' }
+      return { ok: false, error: 'Requisição não encontrada.' }
     }
     if (msg === 'NOT_PENDING') {
-      return { ok: false, error: 'This request is no longer pending.' }
+      return { ok: false, error: 'Esta requisição não está mais pendente.' }
     }
     if (msg === 'KEY_NOT_WITH_ASSISTANT') {
       return {
         ok: false,
         error:
-          'The key is not with the assistant anymore. Resolve custody first.',
+          'A chave não está mais com a secretaria. Resolva a posse da chave primeiro.',
       }
     }
     if (msg === 'WRONG_KIND') {
       return {
         ok: false,
         error:
-          'This request must be accepted by the current key holder, not the assistant.',
+          'Esta requisição deve ser aceita por quem tem a chave, não pela secretaria.',
       }
     }
     console.error(e)
-    return { ok: false, error: 'Could not accept the request. Try again.' }
+    return { ok: false, error: 'Não foi possível aceitar a requisição. Tente novamente.' }
   }
 
   revalidatePath('/dashboard')

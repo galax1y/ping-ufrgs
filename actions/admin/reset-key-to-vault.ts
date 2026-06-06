@@ -37,7 +37,7 @@ export async function resetKeyToVaultAction(): Promise<ResetKeyResult> {
         source: 'admin_action',
         actorId: admin.id,
         requestId: null,
-        note: 'Key returned to assistant custody (vault)',
+        note: 'Chave devolvida à posse da secretaria',
       })
 
       await tx
@@ -46,13 +46,13 @@ export async function resetKeyToVaultAction(): Promise<ResetKeyResult> {
           status: 'cancelled',
           decidedById: admin.id,
           decidedAt: new Date(),
-          decisionNote: 'Cancelled: key reset to vault by admin',
+          decisionNote: 'Cancelada: chave restaurada à secretaria pelo administrador',
         })
         .where(eq(keyRequestsInPing.status, 'pending'))
     })
   } catch (e) {
     console.error(e)
-    return { ok: false, error: 'Could not reset the key. Try again.' }
+    return { ok: false, error: 'Não foi possível restaurar a chave. Tente novamente.' }
   }
 
   revalidatePath('/dashboard')

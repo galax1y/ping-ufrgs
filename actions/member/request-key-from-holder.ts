@@ -30,7 +30,7 @@ export async function requestKeyFromHolderAction(
     return {
       ok: false,
       error:
-        'Assistants cannot use this request. Use assistant tools on the dashboard.',
+        'A secretaria não pode usar esta requisição. Use as ferramentas da secretaria no painel.',
     }
   }
 
@@ -44,7 +44,7 @@ export async function requestKeyFromHolderAction(
           .limit(1)
 
         if (isSameMember(keyRow?.holderId, member.id)) {
-          return { error: 'You already have the key.' }
+          return { error: 'Você já está com a chave.' }
         }
 
         let holderRole: 'admin' | 'member' | 'assistant' | null = null
@@ -63,7 +63,7 @@ export async function requestKeyFromHolderAction(
         if (keyWithAssistant) {
           return {
             error:
-              'The key is with the assistant. Request it from the assistant instead.',
+              'A chave está com a secretaria. Requisite-a à secretaria.',
           }
         }
 
@@ -81,7 +81,7 @@ export async function requestKeyFromHolderAction(
           .limit(1)
 
         if (existing) {
-          return { error: 'Você já tem um requisição pendente.' }
+          return { error: 'Você já tem uma requisição pendente.' }
         }
 
         const trimmedReason = reason.trim() || null
@@ -123,13 +123,13 @@ export async function requestKeyFromHolderAction(
         ? String((e as { code: unknown }).code)
         : ''
     if (code === '23505') {
-      return { ok: false, error: 'Você já tem um requisição pendente.' }
+      return { ok: false, error: 'Você já tem uma requisição pendente.' }
     }
     if (e instanceof Error && e.message === 'INSERT_FAILED') {
-      return { ok: false, error: 'Could not create the request. Try again.' }
+      return { ok: false, error: 'Não foi possível criar a requisição. Tente novamente.' }
     }
     console.error(e)
-    return { ok: false, error: 'Could not create the request. Try again.' }
+    return { ok: false, error: 'Não foi possível criar a requisição. Tente novamente.' }
   }
 
   revalidatePath('/dashboard')

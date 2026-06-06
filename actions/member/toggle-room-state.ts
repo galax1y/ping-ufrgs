@@ -26,7 +26,7 @@ export async function toggleRoomStateAction(): Promise<ToggleRoomResult> {
   if (member.role === 'assistant') {
     return {
       ok: false,
-      error: 'Assistants cannot change the room state from here.',
+      error: 'A secretaria não pode alterar o status da sala por aqui.',
     }
   }
 
@@ -39,7 +39,7 @@ export async function toggleRoomStateAction(): Promise<ToggleRoomResult> {
   if (!isSameMember(keyRow?.holderId, member.id)) {
     return {
       ok: false,
-      error: 'Only the person holding the key can change the room state.',
+      error: 'Somente quem está com a chave pode alterar o status da sala.',
     }
   }
 
@@ -50,7 +50,7 @@ export async function toggleRoomStateAction(): Promise<ToggleRoomResult> {
     .limit(1)
 
   if (!roomRow) {
-    return { ok: false, error: 'Room is not configured yet.' }
+    return { ok: false, error: 'A sala ainda não foi configurada.' }
   }
 
   const nextOpen = !roomRow.isOpen

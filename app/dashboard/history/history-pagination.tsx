@@ -54,7 +54,7 @@ export function HistoryPagination({
     >
       <p className='text-muted-foreground text-[11px] tabular-nums sm:text-xs'>
         {total === 0 ? (
-          'No entries in this log.'
+          'Nenhum registro neste histórico.'
         ) : (
           <>
             Mostrando {showingFrom}–{showingTo} de {total}

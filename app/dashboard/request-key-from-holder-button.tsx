@@ -31,7 +31,7 @@ export function RequestKeyFromHolderButton({
           ? async () => {
               const r = await requestKeyFromHolderAction('')
               if (r.ok) {
-                toast.success('Request sent.')
+                toast.success('Requisição enviada.')
                 router.refresh()
               } else {
                 toast.error(r.error)

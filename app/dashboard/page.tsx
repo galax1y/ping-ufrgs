@@ -33,19 +33,19 @@ export default async function DashboardPage() {
   } = state
 
   const assistantRequestHint = pendingRequestId
-    ? 'Você já tem um requisição pendente.'
+    ? 'Você já tem uma requisição pendente.'
     : selfHoldsKey
-      ? 'You are holding the key.'
-      : 'The key is with the assistant. You can request it below.'
+      ? 'Você está com a chave.'
+      : 'A chave está com a secretaria. Você pode requisitá-la abaixo.'
 
   const holderRequestHint = pendingRequestId
-    ? 'Você já tem um requisição pendente.'
+    ? 'Você já tem uma requisição pendente.'
     : selfHoldsKey
-      ? 'You are holding the key.'
-      : `Ask ${key.holderName ?? 'the holder'} to pass you the key.`
+      ? 'Você está com a chave.'
+      : `Peça a ${key.holderName ?? 'quem tem a chave'} para transferir a chave para você.`
 
   const keyHeadline =
-    key.holderId == null ? 'Assistant' : (key.holderName ?? 'Unknown')
+    key.holderId == null ? 'Secretaria' : (key.holderName ?? 'Desconhecido')
 
 
   const roomTone: SemanticStatusTone = !room
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
                 </p>
               ) : (
                 <p className={cn('text-lg font-semibold', roomS.emphasis)}>
-                  Setup needed
+                  Configuração pendente
                 </p>
               )}
             </div>
@@ -163,7 +163,7 @@ export default async function DashboardPage() {
         {showAssistantRequestCard ? (
           <div className='border-border/50 bg-card/60 space-y-3 rounded-2xl border p-4 shadow-sm'>
             <div className='space-y-1'>
-              <p className='text-sm font-medium'>Request key from assistant</p>
+              <p className='text-sm font-medium'>Requisitar chave à secretaria</p>
               <p className='text-muted-foreground text-xs text-pretty'>
                 {assistantRequestHint}
               </p>
@@ -186,7 +186,7 @@ export default async function DashboardPage() {
             <RequestKeyFromHolderButton
               canRequest={canRequestKeyFromHolder}
               pending={pendingRequestId != null}
-              holderName={key.holderName ?? 'holder'}
+              holderName={key.holderName ?? 'quem tem a chave'}
             />
           </div>
         ) : null}

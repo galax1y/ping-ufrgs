@@ -25,7 +25,7 @@ export function FooterThemeToggle() {
     return (
       <div className={baseClass} aria-hidden>
         <span className='size-5' />
-        Theme
+        Tema
       </div>
     )
   }
@@ -36,7 +36,7 @@ export function FooterThemeToggle() {
       type='button'
       className={baseClass}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label={isDark ? 'Trocar para light mode' : 'Trocar para dark mode'}
+      aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
     >
       {isDark ? (
         <Sun className='size-5' strokeWidth={2} />

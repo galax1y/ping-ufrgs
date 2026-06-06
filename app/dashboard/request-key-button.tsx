@@ -29,7 +29,7 @@ export function RequestKeyButton({
           ? async () => {
             const r = await requestKeyAction('')
             if (r.ok) {
-              toast.success('Request sent.')
+              toast.success('Requisição enviada.')
               router.refresh()
             } else {
               toast.error(r.error)

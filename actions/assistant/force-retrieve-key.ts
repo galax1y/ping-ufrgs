@@ -55,7 +55,7 @@ export async function forceRetrieveKeyAction(): Promise<ForceRetrieveKeyResult> 
           status: 'cancelled',
           decidedById: assistant.id,
           decidedAt: now,
-          decisionNote: 'Cancelled: assistant forcibly retrieved the key',
+          decisionNote: 'Cancelada: secretaria registrou devolução da chave',
         })
         .where(eq(keyRequestsInPing.status, 'pending'))
 
@@ -73,14 +73,14 @@ export async function forceRetrieveKeyAction(): Promise<ForceRetrieveKeyResult> 
     if (msg === 'IN_VAULT') {
       return {
         ok: false,
-        error: 'The key is already in the vault. There is nothing to retrieve.',
+        error: 'A chave já está com a secretaria. Não há nada a recuperar.',
       }
     }
     if (msg === 'ALREADY_HOLD') {
-      return { ok: false, error: 'You are already holding the key.' }
+      return { ok: false, error: 'Você já está com a chave.' }
     }
     console.error(e)
-    return { ok: false, error: 'Could not retrieve the key. Try again.' }
+    return { ok: false, error: 'Não foi possível registrar a devolução. Tente novamente.' }
   }
 
   revalidatePath('/dashboard')

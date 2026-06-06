@@ -31,7 +31,7 @@ export function ThemeToggle() {
       size='icon-sm'
       className='size-8'
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
     >
       {isDark ? (
         <Sun className='size-4' />

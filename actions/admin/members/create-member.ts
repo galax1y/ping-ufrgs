@@ -32,11 +32,11 @@ export async function createMemberAction(
   const roleRaw = String(formData.get('role') ?? 'member')
 
   if (!name || !email || !enrollmentNumber || !password) {
-    return { ok: false, error: 'Name, email, enrollment, and password are required.' }
+    return { ok: false, error: 'Nome, e-mail, matrícula e senha são obrigatórios.' }
   }
 
   if (!ROLES.includes(roleRaw as (typeof ROLES)[number])) {
-    return { ok: false, error: 'Invalid role.' }
+    return { ok: false, error: 'Cargo inválido.' }
   }
 
   const role = roleRaw as (typeof ROLES)[number]
@@ -62,11 +62,11 @@ export async function createMemberAction(
       }
       return {
         ok: false,
-        error: 'That email or enrollment number is already in use.',
+        error: 'Este e-mail ou matrícula já está em uso.',
       }
     }
     console.error(e)
-    return { ok: false, error: 'Could not create the member. Try again.' }
+    return { ok: false, error: 'Não foi possível criar o membro. Tente novamente.' }
   }
 
   revalidatePath('/admin/members')

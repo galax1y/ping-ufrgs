@@ -48,7 +48,7 @@ function NavItem({
         {showBadge ? (
           <span
             className='bg-destructive text-destructive-foreground ring-background absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] leading-none font-bold shadow-sm ring-2'
-            aria-label={`${badgeCount} pending`}
+            aria-label={`${badgeCount} pendente${badgeCount === 1 ? '' : 's'}`}
           >
             {badgeLabel}
           </span>
@@ -90,7 +90,7 @@ export function AppBottomNav({
       >
         <NavItem
           href='/dashboard'
-          label='Dashboard'
+          label='Painel'
           icon={LayoutGrid}
           active={onStatus}
         />
@@ -105,7 +105,7 @@ export function AppBottomNav({
         {isAssistant ? (
           <NavItem
             href='/dashboard/key-requests'
-            label='Requisicoes'
+            label='Requisições'
             icon={ClipboardList}
             active={onRequests}
             badgeCount={pendingKeyRequestCount}
@@ -113,7 +113,7 @@ export function AppBottomNav({
         ) : null}
         <NavItem
           href='/dashboard/history'
-          label='Historico'
+          label='Histórico'
           icon={History}
           active={onHistory}
         />

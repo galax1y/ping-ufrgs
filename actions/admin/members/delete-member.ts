@@ -15,7 +15,7 @@ export async function deleteMemberAction(id: string): Promise<DeleteMemberResult
   const admin = await requireAdmin()
 
   if (id === admin.id) {
-    return { ok: false, error: 'You cannot delete your own account.' }
+    return { ok: false, error: 'Você não pode excluir a própria conta.' }
   }
 
   try {
@@ -29,7 +29,7 @@ export async function deleteMemberAction(id: string): Promise<DeleteMemberResult
       return {
         ok: false,
         error:
-          'This member cannot be deleted while they are referenced by keys, requests, or logs.',
+          'Este membro não pode ser excluído enquanto estiver referenciado em chaves, requisições ou histórico.',
       }
     }
     throw e

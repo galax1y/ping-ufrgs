@@ -34,11 +34,11 @@ export async function updateMemberAction(
   const roleRaw = String(formData.get('role') ?? 'member')
 
   if (!id || !name || !email || !enrollmentNumber) {
-    return { ok: false, error: 'Missing required fields.' }
+    return { ok: false, error: 'Preencha todos os campos obrigatórios.' }
   }
 
   if (!ROLES.includes(roleRaw as (typeof ROLES)[number])) {
-    return { ok: false, error: 'Invalid role.' }
+    return { ok: false, error: 'Cargo inválido.' }
   }
 
   const role = roleRaw as (typeof ROLES)[number]
@@ -78,11 +78,11 @@ export async function updateMemberAction(
       }
       return {
         ok: false,
-        error: 'That email or enrollment number is already in use.',
+        error: 'Este e-mail ou matrícula já está em uso.',
       }
     }
     console.error(e)
-    return { ok: false, error: 'Could not update the member. Try again.' }
+    return { ok: false, error: 'Não foi possível atualizar o membro. Tente novamente.' }
   }
 
   revalidatePath('/admin/members')

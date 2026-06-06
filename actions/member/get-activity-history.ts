@@ -37,14 +37,14 @@ function labelKeySource(source: string): string {
     request_approved: 'Aprovação',
     member_trade: 'Transferência',
     assistant_return: 'Assistente',
-    admin_action: 'Admin',
+    admin_action: 'Administrador',
     initial: 'Inicial',
   }
   return labels[source] ?? source
 }
 
 function labelRoomSource(source: string): string {
-  return source === 'admin_override' ? 'Sobrescrição de Admin' : 'Portador da chave'
+  return source === 'admin_override' ? 'Ação de administrador' : 'Portador da chave'
 }
 
 function holderLabel(
@@ -118,7 +118,7 @@ function roomEventHeadline(row: {
 }): { headline: string; detail: string | null } {
   const actor = row.actorName?.trim() || 'Usuário desconhecido'
   const action = row.isOpen ? 'abriu a sala' : 'fechou a sala'
-  const via = row.source === 'admin_override' ? ' ação de admin' : ''
+  const via = row.source === 'admin_override' ? ' (ação de administrador)' : ''
   return {
     headline: `${actor} ${action}${via}.`,
     detail: row.note ?? null,

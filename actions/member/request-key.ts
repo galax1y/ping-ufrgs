@@ -23,7 +23,7 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
   if (member.role === 'assistant') {
     return {
       ok: false,
-      error: 'Assistants cannot use member requests. Retrieve the key from the dashboard if needed.',
+      error: 'A secretaria não pode usar requisições de membro. Use as ferramentas da secretaria no painel, se necessário.',
     }
   }
 
@@ -37,7 +37,7 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
           .limit(1)
 
         if (isSameMember(keyRow?.holderId, member.id)) {
-          return { error: 'You already have the key.' }
+          return { error: 'Você já está com a chave.' }
         }
 
         let holderRole: 'admin' | 'member' | 'assistant' | null = null
@@ -56,7 +56,7 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
         if (!keyWithAssistant) {
           return {
             error:
-              'The key is not with the assistant right now. Ask the current holder.',
+              'A chave não está com a secretaria no momento. Peça a quem tem a chave.',
           }
         }
 
@@ -72,7 +72,7 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
           .limit(1)
 
         if (existing) {
-          return { error: 'Você já tem um requisição pendente.' }
+          return { error: 'Você já tem uma requisição pendente.' }
         }
 
         const trimmedReason = reason.trim() || null
@@ -113,13 +113,13 @@ export async function requestKeyAction(reason: string): Promise<RequestKeyResult
         ? String((e as { code: unknown }).code)
         : ''
     if (code === '23505') {
-      return { ok: false, error: 'Você já tem um requisição pendente.' }
+      return { ok: false, error: 'Você já tem uma requisição pendente.' }
     }
     if (e instanceof Error && e.message === 'INSERT_FAILED') {
-      return { ok: false, error: 'Could not create the request. Try again.' }
+      return { ok: false, error: 'Não foi possível criar a requisição. Tente novamente.' }
     }
     console.error(e)
-    return { ok: false, error: 'Could not create the request. Try again.' }
+    return { ok: false, error: 'Não foi possível criar a requisição. Tente novamente.' }
   }
 
   revalidatePath('/dashboard')

@@ -40,7 +40,7 @@ export function HolderIncomingRequests({
                 {r.requesterEmail}
               </p>
               <p className='text-muted-foreground mt-1 text-[11px]'>
-                {new Date(r.createdAt).toLocaleString(undefined, {
+                {new Date(r.createdAt).toLocaleString('pt-BR', {
                   dateStyle: 'medium',
                   timeStyle: 'short',
                 })}
@@ -60,7 +60,7 @@ export function HolderIncomingRequests({
                 startTransition(async () => {
                   const res = await acceptKeyRequestFromHolderAction(r.id)
                   if (res.ok) {
-                    toast.success('Key transferred. Log updated.')
+                    toast.success('Chave transferida. Histórico atualizado.')
                     router.refresh()
                   } else {
                     toast.error(res.error)

@@ -28,7 +28,7 @@ export function AdminResetKeyCard() {
       <div className='space-y-1'>
         <p className='text-sm font-medium text-amber-500 '>Ação de admin</p>
         <p className='text-muted-foreground text-xs text-pretty'>
-          Restaurar a chave para a posse da secreatria. Requisições pendentes serão rejeitadas.
+          Restaurar a chave para a posse da secretaria. Requisições pendentes serão canceladas.
         </p>
       </div>
       <AlertDialog open={open} onOpenChange={setOpen}>
@@ -41,7 +41,7 @@ export function AdminResetKeyCard() {
           <AlertDialogHeader>
             <AlertDialogTitle>Restaurar posse da chave?</AlertDialogTitle>
             <AlertDialogDescription>
-              Restaurar a chave para a posse da secreatria. Requisições pendentes serão rejeitadas.
+              Restaurar a chave para a posse da secretaria. Requisições pendentes serão canceladas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

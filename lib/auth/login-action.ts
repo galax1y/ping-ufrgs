@@ -20,7 +20,7 @@ export async function loginAction(
   const password = String(formData.get('password') ?? '')
 
   if (!email || !password) {
-    return { ok: false, error: 'Email and password are required.' }
+    return { ok: false, error: 'Informe e-mail e senha.' }
   }
 
   const [row] = await database
@@ -30,18 +30,18 @@ export async function loginAction(
     .limit(1)
 
   if (!row) {
-    return { ok: false, error: 'Invalid email or password.' }
+    return { ok: false, error: 'E-mail ou senha incorretos.' }
   }
 
   const valid = await verifyPassword(password, row.passwordHash)
   if (!valid) {
-    return { ok: false, error: 'Invalid email or password.' }
+    return { ok: false, error: 'E-mail ou senha incorretos.' }
   }
 
   if (row.disabled) {
     return {
       ok: false,
-      error: 'This account has been disabled. Contact an administrator.',
+      error: 'Esta conta foi desabilitada. Entre em contato com um administrador.',
     }
   }
 

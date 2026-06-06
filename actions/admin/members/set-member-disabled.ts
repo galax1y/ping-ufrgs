@@ -24,11 +24,11 @@ export async function setMemberDisabledAction(
   const admin = await requireAdmin()
 
   if (!memberId) {
-    return { ok: false, error: 'Invalid member.' }
+    return { ok: false, error: 'Membro inválido.' }
   }
 
   if (disabled && isSameMember(memberId, admin.id)) {
-    return { ok: false, error: 'You cannot disable your own account.' }
+    return { ok: false, error: 'Você não pode desabilitar a própria conta.' }
   }
 
   if (!disabled) {
@@ -75,17 +75,17 @@ export async function setMemberDisabledAction(
       return {
         ok: false,
         error:
-          'This member currently holds the key. Transfer or reset custody before disabling them.',
+          'Este membro está com a chave. Transfira ou restaure a posse antes de desabilitá-lo.',
       }
     }
     if (msg === 'NOT_FOUND') {
-      return { ok: false, error: 'Member not found.' }
+      return { ok: false, error: 'Membro não encontrado.' }
     }
     if (isUniqueViolation(e)) {
       return { ok: false, error: ASSISTANT_CONFLICT_MESSAGE }
     }
     console.error(e)
-    return { ok: false, error: 'Could not update the account. Try again.' }
+    return { ok: false, error: 'Não foi possível atualizar a conta. Tente novamente.' }
   }
 
   revalidatePath('/admin/members')

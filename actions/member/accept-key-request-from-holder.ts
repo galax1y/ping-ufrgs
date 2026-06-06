@@ -28,12 +28,12 @@ export async function acceptKeyRequestFromHolderAction(
   if (holder.role === 'assistant') {
     return {
       ok: false,
-      error: 'Use the assistant request queue for vault handovers.',
+      error: 'Use a fila de requisições da secretaria para entregas a partir da secretaria.',
     }
   }
 
   if (!requestId) {
-    return { ok: false, error: 'Invalid request.' }
+    return { ok: false, error: 'Requisição inválida.' }
   }
 
   try {
@@ -103,7 +103,7 @@ export async function acceptKeyRequestFromHolderAction(
           status: 'cancelled',
           decidedById: holder.id,
           decidedAt,
-          decisionNote: 'Cancelled: key issued to another member',
+          decisionNote: 'Cancelada: chave entregue a outro membro',
         })
         .where(
           and(
@@ -115,28 +115,28 @@ export async function acceptKeyRequestFromHolderAction(
   } catch (e) {
     const msg = e instanceof Error ? e.message : ''
     if (msg === 'NOT_FOUND') {
-      return { ok: false, error: 'Request not found.' }
+      return { ok: false, error: 'Requisição não encontrada.' }
     }
     if (msg === 'NOT_PENDING') {
-      return { ok: false, error: 'This request is no longer pending.' }
+      return { ok: false, error: 'Esta requisição não está mais pendente.' }
     }
     if (msg === 'WRONG_KIND') {
-      return { ok: false, error: 'This is not a holder-to-holder request.' }
+      return { ok: false, error: 'Esta não é uma requisição entre portadores da chave.' }
     }
     if (msg === 'NOT_YOUR_REQUEST') {
       return {
         ok: false,
-        error: 'Only the person this was sent to can accept it.',
+        error: 'Somente quem recebeu a requisição pode aceitá-la.',
       }
     }
     if (msg === 'NO_LONGER_HOLDER') {
       return {
         ok: false,
-        error: 'You no longer hold the key — this request is stale.',
+        error: 'Você não tem mais a chave — esta requisição expirou.',
       }
     }
     console.error(e)
-    return { ok: false, error: 'Could not accept the request. Try again.' }
+    return { ok: false, error: 'Não foi possível aceitar a requisição. Tente novamente.' }
   }
 
   revalidatePath('/dashboard')
