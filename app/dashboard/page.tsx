@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { DoorOpen, KeyRound } from 'lucide-react'
 
 import { getDashboardState } from '@/actions/member/get-dashboard-state'
+import { KeyRequestRequesterPhoto } from '@/components/key-request-requester-photo'
 import { type SemanticStatusTone, semanticStatus } from '@/lib/semantic-status'
 import { cn } from '@/lib/utils'
 
@@ -140,14 +141,23 @@ export default async function DashboardPage() {
             <p className='text-muted-foreground mb-1 text-[11px] font-medium tracking-[0.2em] uppercase'>
               Status da Chave
             </p>
-            <p
-              className={cn(
-                'text-3xl font-semibold tracking-tight sm:text-4xl',
-                keyS.titleSoft,
+            <div className='flex items-center gap-3'>
+              {key.holderId && (
+                <KeyRequestRequesterPhoto
+                  requesterId={key.holderId}
+                  requesterName={key.holderName ?? 'Desconhecido'}
+                  photoVersion={key.holderPhotoVersion}
+                />
               )}
-            >
-              {keyHeadline}
-            </p>
+              <p
+                className={cn(
+                  'text-3xl font-semibold tracking-tight sm:text-4xl',
+                  keyS.titleSoft,
+                )}
+              >
+                {keyHeadline}
+              </p>
+            </div>
           </div>
         </section>
 

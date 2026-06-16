@@ -43,6 +43,7 @@ export type DashboardState = {
     holderId: string | null
     holderName: string | null
     holderRole: 'admin' | 'member' | 'assistant' | null
+    holderPhotoVersion: number | null
     heldSince: Date | null
   }
   /**
@@ -92,12 +93,15 @@ export async function getDashboardState(): Promise<DashboardState> {
 
   let holderName: string | null = null
   let holderRole: DashboardState['key']['holderRole'] = null
+  let holderPhotoVersion: number | null = null
 
   if (keyRow?.holderId) {
     const [h] = await database
       .select({
         name: membersInPing.name,
         role: membersInPing.role,
+        profilePicture: membersInPing.profilePicture,
+        updatedAt: membersInPing.updatedAt,
       })
       .from(membersInPing)
       .where(eq(membersInPing.id, keyRow.holderId))
@@ -105,6 +109,10 @@ export async function getDashboardState(): Promise<DashboardState> {
     if (h) {
       holderName = h.name
       holderRole = h.role
+      holderPhotoVersion = memberPhotoVersion(
+        h.updatedAt,
+        h.profilePicture != null,
+      )
     }
   }
 
@@ -219,6 +227,7 @@ export async function getDashboardState(): Promise<DashboardState> {
       holderId: keyRow?.holderId ?? null,
       holderName,
       holderRole,
+      holderPhotoVersion,
       heldSince: keyRow?.heldSince ?? null,
     },
     keyWithAssistant,
