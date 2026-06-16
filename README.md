@@ -70,17 +70,10 @@ Para atualizar o esquema a partir do banco (Supabase/Postgres):
 npx drizzle-kit pull
 ```
 
-## 🧪 Testes E2E (Playwright)
-Certifique-se de que o Playwright está instalado:
-```bash
-npx playwright install
-npx playwright test
-# Ou via script npm:
-npm run test:e2e
-```
-
 ## 📚 Documentação Adicional
 - [Next.js](https://nextjs.org)
+- [shadcn/ui](https://ui.shadcn.com)
+- [Drizzle ORM](https://orm.drizzle.team)
 - [shadcn/ui](https://ui.shadcn.com)
 - [Drizzle ORM](https://orm.drizzle.team)
 - [Playwright](https://playwright.dev)
