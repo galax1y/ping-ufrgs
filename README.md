@@ -7,14 +7,9 @@ Um sistema de controle de posse de chaves e visualização de status de sala, de
 O projeto segue uma arquitetura integrando estilos de engenharia de software para garantir escalabilidade e manutenção.
 
 ### Estilos Arquiteturais Aplicados
-- **Arquitetura em Camadas**: Separação clara entre Apresentação, Aplicação (Lógica), Domínio e Persistência.
-- **MVC (Model-View-Controller)**: Adaptado para o paradigma de componentes React (View) e Server Actions (Controller).
-- **Cliente-Servidor**: Gerenciamento de estado híbrido entre o navegador e o servidor Node.js.
 
-### Diagrama de Sistema
-```
-[Usuário] <--> [Interface React/Next.js] <--> [Server Actions] <--> [PostgreSQL (Drizzle)]
-```
+- **Arquitetura em Camadas**: Separação clara entre Apresentação, Aplicação (Lógica), Domínio e Persistência.
+- **JAMStack**: Adaptado para o paradigma de componentes React (View) e Server Actions (Controller).
 
 ## 📁 Estrutura do Projeto
 
@@ -46,11 +41,14 @@ O projeto segue uma arquitetura integrando estilos de engenharia de software par
 ## 🚀 Começando
 
 ### Pré-requisitos
+
 - Node.js versão 24
 - Arquivo `.env` com a variável `DATABASE_URL`
 
 ### Instalação
+
 Clone o repositório e instale as dependências:
+
 ```bash
 git clone <repository-url>
 cd ping-ufrgs
@@ -58,19 +56,25 @@ npm install
 ```
 
 ### Desenvolvimento
+
 Execute o servidor de desenvolvimento:
+
 ```bash
 npm run dev
 ```
+
 Acesse [http://localhost:3000](http://localhost:3000).
 
 ## 🗄️ Esquema do Banco de Dados
+
 Para atualizar o esquema a partir do banco (Supabase/Postgres):
+
 ```bash
 npx drizzle-kit pull
 ```
 
 ## 📚 Documentação Adicional
+
 - [Next.js](https://nextjs.org)
 - [shadcn/ui](https://ui.shadcn.com)
 - [Drizzle ORM](https://orm.drizzle.team)
